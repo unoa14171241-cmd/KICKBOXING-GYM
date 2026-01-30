@@ -20,6 +20,7 @@ const adminNavItems = [
   { href: '/admin/members', icon: Users, label: '会員管理' },
   { href: '/admin/reservations', icon: Calendar, label: '予約管理' },
   { href: '/admin/checkin', icon: QrCode, label: 'チェックイン' },
+  { href: '/admin/store-qr', icon: QrCode, label: '店舗QRコード' },
   { href: '/admin/trainers', icon: UserCog, label: 'トレーナー管理' },
   { href: '/admin/plans', icon: CreditCard, label: 'プラン管理' },
   { href: '/admin/products', icon: Package, label: '商品管理' },
