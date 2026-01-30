@@ -31,7 +31,21 @@ const eventTypes = [
   { id: 'social', label: '交流会' },
 ]
 
-const emptyEvent = {
+interface EditingEvent {
+  id: string
+  title: string
+  description: string
+  date: string
+  startTime: string
+  endTime: string
+  location: string
+  capacity: number | null
+  price: number
+  eventType: string
+  isPublished: boolean
+}
+
+const emptyEvent: EditingEvent = {
   id: '',
   title: '',
   description: '',
@@ -50,7 +64,7 @@ export default function AdminEventsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [editingEvent, setEditingEvent] = useState(emptyEvent)
+  const [editingEvent, setEditingEvent] = useState<EditingEvent>(emptyEvent)
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
@@ -315,7 +329,7 @@ export default function AdminEventsPage() {
               label="定員"
               type="number"
               value={editingEvent.capacity || ''}
-              onChange={(e) => setEditingEvent({ ...editingEvent, capacity: parseInt(e.target.value) || null })}
+              onChange={(e) => setEditingEvent({ ...editingEvent, capacity: e.target.value ? parseInt(e.target.value) : null })}
             />
             <Input
               label="参加費（円）"
