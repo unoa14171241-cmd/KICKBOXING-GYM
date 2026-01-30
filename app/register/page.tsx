@@ -36,12 +36,27 @@ export default function RegisterPage() {
     planId: '',
   })
 
+  const [plansLoading, setPlansLoading] = useState(true)
+  const [plansError, setPlansError] = useState('')
+
   useEffect(() => {
     // プラン一覧を取得
+    setPlansLoading(true)
+    setPlansError('')
     fetch('/api/plans')
-      .then(res => res.json())
-      .then(data => setPlans(data.plans || []))
-      .catch(console.error)
+      .then(res => {
+        if (!res.ok) throw new Error('プランの取得に失敗しました')
+        return res.json()
+      })
+      .then(data => {
+        setPlans(data.plans || [])
+        setPlansLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setPlansError('プランを読み込めませんでした。プランなしで登録を続けることができます。')
+        setPlansLoading(false)
+      })
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -263,42 +278,52 @@ export default function RegisterPage() {
                   )}
                   
                   <div className="grid gap-4">
-                    {plans.length > 0 ? plans.map((plan) => (
-                      <label
-                        key={plan.id}
-                        className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          formData.planId === plan.id
-                            ? 'border-primary-500 bg-primary-500/10'
-                            : 'border-dark-600 hover:border-dark-500'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="planId"
-                          value={plan.id}
-                          checked={formData.planId === plan.id}
-                          onChange={handleChange}
-                          className="sr-only"
-                        />
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-white">{plan.name}</h3>
-                            <p className="text-sm text-dark-400">
-                              月{plan.sessionsPerMonth === 0 ? '無制限' : `${plan.sessionsPerMonth}回`}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-white">
-                              ¥{plan.price.toLocaleString()}
-                            </span>
-                            <span className="text-dark-400">/月</span>
-                          </div>
-                        </div>
-                      </label>
-                    )) : (
+                    {plansLoading ? (
                       <div className="text-center py-8 text-dark-400">
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 border-t-transparent mx-auto mb-4" />
                         <p>プランを読み込み中...</p>
-                        <p className="text-sm mt-2">（後からプランを選択することもできます）</p>
+                      </div>
+                    ) : plans.length > 0 ? (
+                      plans.map((plan) => (
+                        <label
+                          key={plan.id}
+                          className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                            formData.planId === plan.id
+                              ? 'border-primary-500 bg-primary-500/10'
+                              : 'border-dark-200 hover:border-dark-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="planId"
+                            value={plan.id}
+                            checked={formData.planId === plan.id}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-semibold text-dark-900">{plan.name}</h3>
+                              <p className="text-sm text-dark-500">
+                                月{plan.sessionsPerMonth === 0 ? '無制限' : `${plan.sessionsPerMonth}回`}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-2xl font-bold text-dark-900">
+                                ¥{plan.price.toLocaleString()}
+                              </span>
+                              <span className="text-dark-500">/月</span>
+                            </div>
+                          </div>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-dark-500">
+                        {plansError && (
+                          <p className="text-yellow-600 mb-2">{plansError}</p>
+                        )}
+                        <p>プランは後から選択できます</p>
+                        <p className="text-sm mt-2">まずはアカウントを作成しましょう</p>
                       </div>
                     )}
                   </div>
