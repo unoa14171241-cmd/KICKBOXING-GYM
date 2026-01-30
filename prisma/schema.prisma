@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// =====================================
+// ユーザー・認証関連
+// =====================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  role          String    @default("member") // member, trainer, owner
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  member        Member?
+  trainer       Trainer?
+
+  @@map("users")
+}
+
+// =====================================
+// 会員関連
+// =====================================
+
+model Member {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 基本情報
+  firstName       String
+  lastName        String
+  firstNameKana   String
+  lastNameKana    String
+  phone           String
+  dateOfBirth     DateTime?
+  gender          String?   // male, female, other
+  address         String?
+  emergencyContact String?
+  emergencyPhone  String?
+  
+  // 会員情報
+  memberNumber    String    @unique
+  planId          String?
+  plan            Plan?     @relation(fields: [planId], references: [id])
+  status          String    @default("active") // active, suspended, cancelled
+  remainingSessions Int     @default(0)
+  joinedAt        DateTime  @default(now())
+  expiresAt       DateTime?
+  
+  // QR会員証
+  qrCode          String    @unique
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reservations    Reservation[]
+  checkIns        CheckIn[]
+  orders          Order[]
+  eventRegistrations EventRegistration[]
+
+  @@map("members")
+}
+
+model Trainer {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  firstName       String
+  lastName        String
+  specialization  String?   // キックボクシング、ボクシング、フィットネス等
+  bio             String?
+  imageUrl        String?
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  schedules       Schedule[]
+  reservations    Reservation[]
+
+  @@map("trainers")
+}
+
+// =====================================
+// プラン・料金関連
+// =====================================
+
+model Plan {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  price           Int       // 月額料金（円）
+  sessionsPerMonth Int      // 月のセッション数（0 = 無制限）
+  durationMonths  Int       @default(1) // 契約期間（月）
+  features        String?   // JSON形式の特典リスト
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  members         Member[]
+
+  @@map("plans")
+}
+
+// =====================================
+// 予約関連
+// =====================================
+
+model Schedule {
+  id              String    @id @default(cuid())
+  trainerId       String
+  trainer         Trainer   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  
+  dayOfWeek       Int       // 0-6 (日-土)
+  startTime       String    // "09:00"形式
+  endTime         String    // "10:00"形式
+  maxCapacity     Int       @default(1) // パーソナルは1、グループは複数
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reservations    Reservation[]
+
+  @@map("schedules")
+}
+
+model Reservation {
+  id              String    @id @default(cuid())
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  trainerId       String
+  trainer         Trainer   @relation(fields: [trainerId], references: [id])
+  scheduleId      String?
+  schedule        Schedule? @relation(fields: [scheduleId], references: [id])
+  
+  date            DateTime
+  startTime       String
+  endTime         String
+  status          String    @default("confirmed") // confirmed, cancelled, completed, no_show
+  notes           String?
+  
+  // 振替情報
+  isRescheduled   Boolean   @default(false)
+  originalReservationId String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("reservations")
+}
+
+// =====================================
+// 入退館（チェックイン）
+// =====================================
+
+model CheckIn {
+  id              String    @id @default(cuid())
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  checkedInAt     DateTime  @default(now())
+  checkedOutAt    DateTime?
+  method          String    @default("qr") // qr, manual
+  
+  @@map("check_ins")
+}
+
+// =====================================
+// 物販関連
+// =====================================
+
+model Product {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  price           Int
+  imageUrl        String?
+  category        String    // gloves, wraps, apparel, supplements, etc.
+  stock           Int       @default(0)
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  orderItems      OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id              String    @id @default(cuid())
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id])
+  
+  totalAmount     Int
+  status          String    @default("pending") // pending, paid, shipped, delivered, cancelled
+  shippingAddress String?
+  notes           String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id              String    @id @default(cuid())
+  orderId         String
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id])
+  
+  quantity        Int
+  price           Int       // 購入時の価格
+  
+  @@map("order_items")
+}
+
+// =====================================
+// イベント関連
+// =====================================
+
+model Event {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  imageUrl        String?
+  date            DateTime
+  startTime       String
+  endTime         String
+  location        String?
+  capacity        Int?
+  price           Int       @default(0) // 0 = 無料
+  eventType       String    // seminar, competition, workshop, social
+  isPublished     Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  registrations   EventRegistration[]
+
+  @@map("events")
+}
+
+model EventRegistration {
+  id              String    @id @default(cuid())
+  eventId         String
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  status          String    @default("registered") // registered, cancelled, attended
+  paidAt          DateTime?
+  
+  createdAt       DateTime  @default(now())
+
+  @@unique([eventId, memberId])
+  @@map("event_registrations")
+}
