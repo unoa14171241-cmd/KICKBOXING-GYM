@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
 
     const member = await prisma.member.findFirst({
       where: { userId: session.user.id },
+      include: { plan: true },
     })
 
     if (!member) {
