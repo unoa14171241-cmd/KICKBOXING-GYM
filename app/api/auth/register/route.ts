@@ -43,6 +43,9 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12)
 
     // ユーザーと会員情報を作成
+    // planIdが空文字列の場合はnullに変換
+    const validPlanId = planId && planId.trim() !== '' ? planId : null
+    
     const user = await prisma.user.create({
       data: {
         email,
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
             gender,
             memberNumber: generateMemberNumber(),
             qrCode: generateQRCode(),
-            planId,
+            planId: validPlanId,
             status: 'active',
             remainingSessions: 0,
           },
