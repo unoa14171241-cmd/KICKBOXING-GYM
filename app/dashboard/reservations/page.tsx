@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
 import { Card, Badge, Button, Modal } from '@/components/ui'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { Calendar, Clock, User, X, RefreshCw, CheckCircle } from 'lucide-react'
+import { Calendar, Clock, User, X, CheckCircle } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface Reservation {
@@ -21,7 +20,7 @@ interface Reservation {
   isRescheduled: boolean
 }
 
-export default function ReservationsPage() {
+function ReservationsContent() {
   const searchParams = useSearchParams()
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -94,15 +93,10 @@ export default function ReservationsPage() {
 
         {/* Success Message */}
         {showSuccessMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center gap-3"
-          >
+          <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center gap-3 animate-fadeIn">
             <CheckCircle className="w-5 h-5 text-green-500" />
             <span className="text-green-400">予約が完了しました！</span>
-          </motion.div>
+          </div>
         )}
 
         {isLoading ? (
@@ -121,11 +115,9 @@ export default function ReservationsPage() {
               {upcomingReservations.length > 0 ? (
                 <div className="space-y-4">
                   {upcomingReservations.map((reservation) => (
-                    <motion.div
+                    <div
                       key={reservation.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-4 rounded-xl bg-dark-800/50 border border-dark-700"
+                      className="p-4 rounded-xl bg-dark-800/50 border border-dark-700 animate-fadeIn"
                     >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
@@ -171,7 +163,7 @@ export default function ReservationsPage() {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -259,5 +251,19 @@ export default function ReservationsPage() {
         </div>
       </Modal>
     </DashboardLayout>
+  )
+}
+
+export default function ReservationsPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent" />
+        </div>
+      </DashboardLayout>
+    }>
+      <ReservationsContent />
+    </Suspense>
   )
 }
