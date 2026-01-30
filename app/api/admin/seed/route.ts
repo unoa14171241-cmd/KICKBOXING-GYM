@@ -104,24 +104,20 @@ export async function POST(request: Request) {
     })
 
     // トレーナーのスケジュールを作成
-    const schedules = []
     for (let day = 1; day <= 6; day++) { // 月〜土
       for (let hour = 10; hour <= 20; hour++) {
-        schedules.push({
-          trainerId: trainer.id,
-          dayOfWeek: day,
-          startTime: `${hour.toString().padStart(2, '0')}:00`,
-          endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
-          maxCapacity: 1,
-          isActive: true,
+        await prisma.schedule.create({
+          data: {
+            trainerId: trainer.id,
+            dayOfWeek: day,
+            startTime: `${hour.toString().padStart(2, '0')}:00`,
+            endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
+            maxCapacity: 1,
+            isActive: true,
+          },
         })
       }
     }
-    
-    await prisma.schedule.createMany({
-      data: schedules,
-      skipDuplicates: true,
-    })
 
     // サンプル商品を作成
     await Promise.all([
