@@ -2,7 +2,6 @@
 
 import { cn } from '@/lib/utils'
 import { HTMLAttributes, forwardRef } from 'react'
-import { motion } from 'framer-motion'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'glass' | 'glow'
@@ -18,13 +17,10 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     }
 
     return (
-      <motion.div
+      <div
         ref={ref}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
         className={cn(
-          'rounded-2xl p-6',
+          'rounded-2xl p-6 animate-fadeIn',
           variants[variant],
           hoverable && 'transition-all duration-300 hover:transform hover:scale-[1.02] hover:shadow-2xl cursor-pointer',
           className
@@ -32,7 +28,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     )
   }
 )

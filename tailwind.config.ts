@@ -55,6 +55,7 @@ const config: Config = {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
+        'fadeIn': 'fadeIn 0.4s ease-out',
       },
       keyframes: {
         float: {
@@ -64,6 +65,10 @@ const config: Config = {
         glow: {
           '0%': { boxShadow: '0 0 5px #ef4444, 0 0 10px #ef4444, 0 0 15px #ef4444' },
           '100%': { boxShadow: '0 0 10px #ef4444, 0 0 20px #ef4444, 0 0 30px #ef4444' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },
