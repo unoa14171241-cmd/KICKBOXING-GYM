@@ -78,7 +78,7 @@ export default function AdminReservationsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               RESERVATIONS
             </h1>
             <p className="text-dark-400">予約管理</p>
@@ -135,7 +135,7 @@ export default function AdminReservationsPage() {
                       <tr key={reservation.id}>
                         <td>
                           <div>
-                            <p className="text-white font-medium">{formatDate(reservation.date)}</p>
+                            <p className="text-dark-900 font-medium">{formatDate(reservation.date)}</p>
                             <p className="text-sm text-dark-400">
                               {reservation.startTime} - {reservation.endTime}
                             </p>
@@ -143,7 +143,7 @@ export default function AdminReservationsPage() {
                         </td>
                         <td>
                           <div>
-                            <p className="text-white">
+                            <p className="text-dark-900">
                               {reservation.member.lastName} {reservation.member.firstName}
                             </p>
                             <p className="text-xs text-dark-400">{reservation.member.memberNumber}</p>
@@ -217,19 +217,19 @@ export default function AdminReservationsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-dark-400">日付</p>
-                <p className="text-white">{formatDate(selectedReservation.date)}</p>
+                <p className="text-dark-900">{formatDate(selectedReservation.date)}</p>
               </div>
               <div>
                 <p className="text-sm text-dark-400">時間</p>
-                <p className="text-white">{selectedReservation.startTime} - {selectedReservation.endTime}</p>
+                <p className="text-dark-900">{selectedReservation.startTime} - {selectedReservation.endTime}</p>
               </div>
               <div>
                 <p className="text-sm text-dark-400">会員</p>
-                <p className="text-white">{selectedReservation.member.lastName} {selectedReservation.member.firstName}</p>
+                <p className="text-dark-900">{selectedReservation.member.lastName} {selectedReservation.member.firstName}</p>
               </div>
               <div>
                 <p className="text-sm text-dark-400">トレーナー</p>
-                <p className="text-white">{selectedReservation.trainer.lastName} {selectedReservation.trainer.firstName}</p>
+                <p className="text-dark-900">{selectedReservation.trainer.lastName} {selectedReservation.trainer.firstName}</p>
               </div>
             </div>
             <div>

@@ -150,7 +150,7 @@ export default function AdminEventsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               EVENTS
             </h1>
             <p className="text-dark-400">イベント管理</p>
@@ -200,7 +200,7 @@ export default function AdminEventsPage() {
                       <tr key={event.id}>
                         <td>
                           <div>
-                            <p className="text-white font-medium">{event.title}</p>
+                            <p className="text-dark-900 font-medium">{event.title}</p>
                             {event.location && (
                               <p className="text-xs text-dark-400">{event.location}</p>
                             )}
@@ -208,7 +208,7 @@ export default function AdminEventsPage() {
                         </td>
                         <td>
                           <div>
-                            <p className="text-white">{formatDate(event.date)}</p>
+                            <p className="text-dark-900">{formatDate(event.date)}</p>
                             <p className="text-xs text-dark-400">
                               {event.startTime} - {event.endTime}
                             </p>
@@ -220,13 +220,13 @@ export default function AdminEventsPage() {
                           </span>
                         </td>
                         <td>
-                          <span className="text-white">
+                          <span className="text-dark-900">
                             {event._count?.registrations || 0}
                             {event.capacity && `/${event.capacity}`}
                           </span>
                         </td>
                         <td>
-                          <span className="text-white">
+                          <span className="text-dark-900">
                             {event.price === 0 ? '無料' : formatCurrency(event.price)}
                           </span>
                         </td>

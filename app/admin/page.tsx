@@ -99,7 +99,7 @@ export default function AdminDashboardPage() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+          <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
             DASHBOARD
           </h1>
           <p className="text-dark-400">管理ダッシュボード</p>
@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div>
                       <p className="text-dark-400 text-sm">{stat.title}</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-2xl font-bold text-dark-900">
                         {stat.isText ? stat.value : stat.value.toLocaleString()}
                       </p>
                     </div>
@@ -143,7 +143,7 @@ export default function AdminDashboardPage() {
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
-            <h2 className="text-lg font-semibold text-white mb-4">クイックアクション</h2>
+            <h2 className="text-lg font-semibold text-dark-900 mb-4">クイックアクション</h2>
             <div className="grid grid-cols-2 gap-3">
               <a
                 href="/admin/members/new"
@@ -177,7 +177,7 @@ export default function AdminDashboardPage() {
           </Card>
 
           <Card>
-            <h2 className="text-lg font-semibold text-white mb-4">本日の予約</h2>
+            <h2 className="text-lg font-semibold text-dark-900 mb-4">本日の予約</h2>
             <div className="space-y-3">
               {/* デモデータ */}
               {[
@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
                       <Clock className="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p className="text-white font-medium">{reservation.name}</p>
+                      <p className="text-dark-900 font-medium">{reservation.name}</p>
                       <p className="text-xs text-dark-400">{reservation.trainer}</p>
                     </div>
                   </div>

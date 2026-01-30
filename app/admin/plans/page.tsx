@@ -115,10 +115,10 @@ export default function AdminPlansPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               PLANS
             </h1>
-            <p className="text-dark-400">プラン管理</p>
+            <p className="text-dark-500">プラン管理</p>
           </div>
           <Button onClick={openCreateModal}>
             <Plus className="w-5 h-5 mr-2" />
@@ -141,23 +141,23 @@ export default function AdminPlansPage() {
               >
                 <Card hoverable>
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-orange/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-400/20 flex items-center justify-center">
                       <CreditCard className="w-6 h-6 text-primary-500" />
                     </div>
                     <Badge variant={plan.isActive ? 'success' : 'danger'}>
                       {plan.isActive ? '公開中' : '非公開'}
                     </Badge>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                  <h3 className="text-xl font-bold text-dark-900 mb-2">{plan.name}</h3>
                   <div className="mb-3">
-                    <span className="text-3xl font-bold text-white">{formatCurrency(plan.price)}</span>
-                    <span className="text-dark-400">/月</span>
+                    <span className="text-3xl font-bold text-dark-900">{formatCurrency(plan.price)}</span>
+                    <span className="text-dark-500">/月</span>
                   </div>
-                  <p className="text-primary-400 mb-3">
+                  <p className="text-primary-500 font-medium mb-3">
                     月{plan.sessionsPerMonth === 0 ? '無制限' : `${plan.sessionsPerMonth}回`}
                   </p>
                   {plan.description && (
-                    <p className="text-dark-400 text-sm mb-4">{plan.description}</p>
+                    <p className="text-dark-600 text-sm mb-4">{plan.description}</p>
                   )}
                   <div className="text-sm text-dark-500 mb-4">
                     利用中: {plan._count?.members || 0}名
@@ -177,8 +177,8 @@ export default function AdminPlansPage() {
           </div>
         ) : (
           <Card className="text-center py-12">
-            <CreditCard className="w-16 h-16 text-dark-600 mx-auto mb-4" />
-            <p className="text-dark-400">プランが見つかりません</p>
+            <CreditCard className="w-16 h-16 text-dark-300 mx-auto mb-4" />
+            <p className="text-dark-500">プランが見つかりません</p>
           </Card>
         )}
       </div>

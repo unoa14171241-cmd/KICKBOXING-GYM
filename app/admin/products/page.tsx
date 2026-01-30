@@ -114,7 +114,7 @@ export default function AdminProductsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               PRODUCTS
             </h1>
             <p className="text-dark-400">商品管理</p>
@@ -167,7 +167,7 @@ export default function AdminProductsPage() {
                               <Package className="w-5 h-5 text-dark-400" />
                             </div>
                             <div>
-                              <p className="text-white font-medium">{product.name}</p>
+                              <p className="text-dark-900 font-medium">{product.name}</p>
                               {product.description && (
                                 <p className="text-xs text-dark-400 truncate max-w-[200px]">
                                   {product.description}
@@ -182,7 +182,7 @@ export default function AdminProductsPage() {
                           </span>
                         </td>
                         <td>
-                          <span className="text-white font-medium">{formatCurrency(product.price)}</span>
+                          <span className="text-dark-900 font-medium">{formatCurrency(product.price)}</span>
                         </td>
                         <td>
                           <span className={product.stock > 0 ? 'text-green-400' : 'text-red-400'}>

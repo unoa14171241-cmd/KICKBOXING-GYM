@@ -98,7 +98,7 @@ export default function CheckInPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+          <h1 className="text-3xl font-bold text-dark-900 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
             CHECK-IN STATION
           </h1>
           <p className="text-dark-400">会員証をスキャンしてチェックイン/アウト</p>
@@ -123,10 +123,10 @@ export default function CheckInPage() {
                   }`} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
+                  <h2 className="text-2xl font-bold text-dark-900 mb-2">
                     {result.action === 'checkin' ? 'チェックイン完了' : 'チェックアウト完了'}
                   </h2>
-                  <p className="text-xl text-white">{result.member.name}</p>
+                  <p className="text-xl text-dark-900">{result.member.name}</p>
                   <p className="text-dark-400">{result.member.memberNumber}</p>
                   {result.member.plan && (
                     <Badge variant="info" className="mt-2">{result.member.plan}</Badge>
@@ -145,7 +145,7 @@ export default function CheckInPage() {
                   <XCircle className="w-12 h-12 text-red-500" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">エラー</h2>
+                  <h2 className="text-2xl font-bold text-dark-900 mb-2">エラー</h2>
                   <p className="text-red-400">{error}</p>
                 </div>
               </motion.div>
@@ -161,7 +161,7 @@ export default function CheckInPage() {
                   <QrCode className="w-12 h-12 text-primary-500" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-2">
+                  <h2 className="text-xl font-semibold text-dark-900 mb-2">
                     会員証をスキャンしてください
                   </h2>
                   <p className="text-dark-400 text-sm">
@@ -196,13 +196,13 @@ export default function CheckInPage() {
         {/* Recent Check-ins */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-dark-900 flex items-center gap-2">
               <Clock className="w-5 h-5 text-primary-500" />
               最近のチェックイン
             </h2>
             <button
               onClick={() => setRecentCheckIns([])}
-              className="text-dark-400 hover:text-white transition-colors"
+              className="text-dark-400 hover:text-dark-900 transition-colors"
             >
               <RefreshCw className="w-5 h-5" />
             </button>
@@ -226,7 +226,7 @@ export default function CheckInPage() {
                       }`} />
                     </div>
                     <div>
-                      <p className="text-white font-medium">{checkIn.memberName}</p>
+                      <p className="text-dark-900 font-medium">{checkIn.memberName}</p>
                       <p className="text-xs text-dark-400">{checkIn.memberNumber}</p>
                     </div>
                   </div>

@@ -122,7 +122,7 @@ export default function AdminTrainersPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               TRAINERS
             </h1>
             <p className="text-dark-400">トレーナー管理</p>
@@ -168,7 +168,7 @@ export default function AdminTrainersPage() {
                       {trainer.isActive ? 'アクティブ' : '非アクティブ'}
                     </Badge>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-1">
+                  <h3 className="text-xl font-bold text-dark-900 mb-1">
                     {trainer.lastName} {trainer.firstName}
                   </h3>
                   <p className="text-dark-400 text-sm mb-2">{trainer.user.email}</p>

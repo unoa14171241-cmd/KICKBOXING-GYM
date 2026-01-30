@@ -67,7 +67,7 @@ export default function MembersPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
               MEMBERS
             </h1>
             <p className="text-dark-400">会員管理</p>
@@ -133,7 +133,7 @@ export default function MembersPage() {
                       <tr key={member.id}>
                         <td>
                           <div>
-                            <p className="font-medium text-white">
+                            <p className="font-medium text-dark-900">
                               {member.lastName} {member.firstName}
                             </p>
                             <p className="text-xs text-dark-400">{member.email}</p>
@@ -145,7 +145,7 @@ export default function MembersPage() {
                         <td>
                           {member.plan ? (
                             <div>
-                              <p className="text-white">{member.plan.name}</p>
+                              <p className="text-dark-900">{member.plan.name}</p>
                               <p className="text-xs text-dark-400">
                                 {formatCurrency(member.plan.price)}/月
                               </p>
@@ -155,7 +155,7 @@ export default function MembersPage() {
                           )}
                         </td>
                         <td>
-                          <span className="text-white">{member.remainingSessions}回</span>
+                          <span className="text-dark-900">{member.remainingSessions}回</span>
                         </td>
                         <td>
                           <Badge status={member.status} />
