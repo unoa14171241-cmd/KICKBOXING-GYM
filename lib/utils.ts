@@ -50,18 +50,18 @@ export function generateQRCode(): string {
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    active: 'bg-green-500/20 text-green-400 border-green-500/30',
-    suspended: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
-    confirmed: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    completed: 'bg-green-500/20 text-green-400 border-green-500/30',
-    no_show: 'bg-red-500/20 text-red-400 border-red-500/30',
-    pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    paid: 'bg-green-500/20 text-green-400 border-green-500/30',
-    shipped: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    delivered: 'bg-green-500/20 text-green-400 border-green-500/30',
+    active: 'bg-green-50 text-green-600 border-green-200',
+    suspended: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+    cancelled: 'bg-red-50 text-red-600 border-red-200',
+    confirmed: 'bg-blue-50 text-blue-600 border-blue-200',
+    completed: 'bg-green-50 text-green-600 border-green-200',
+    no_show: 'bg-red-50 text-red-600 border-red-200',
+    pending: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+    paid: 'bg-green-50 text-green-600 border-green-200',
+    shipped: 'bg-blue-50 text-blue-600 border-blue-200',
+    delivered: 'bg-green-50 text-green-600 border-green-200',
   }
-  return colors[status] || 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+  return colors[status] || 'bg-gray-100 text-gray-600 border-gray-200'
 }
 
 export function getStatusLabel(status: string): string {

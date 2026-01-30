@@ -42,35 +42,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen pattern-grid">
+    <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-white">
       <Navbar />
       
-      <div className="flex items-center justify-center min-h-screen px-4 pt-20">
+      <div className="flex items-center justify-center min-h-screen px-4 pt-28">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <Card variant="glass" className="p-8">
+          <Card className="p-8 shadow-xl">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-orange flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-500 flex items-center justify-center">
                 <Flame className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
                 WELCOME BACK
               </h1>
-              <p className="text-dark-400">アカウントにログイン</p>
+              <p className="text-gray-500">アカウントにログイン</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
                   {error}
                 </div>
               )}
 
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   type="email"
                   placeholder="メールアドレス"
@@ -82,7 +82,7 @@ export default function LoginPage() {
               </div>
 
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   type="password"
                   placeholder="パスワード"
@@ -94,11 +94,11 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-dark-400">
-                  <input type="checkbox" className="rounded border-dark-600 bg-dark-800 text-primary-500" />
+                <label className="flex items-center gap-2 text-gray-600">
+                  <input type="checkbox" className="rounded border-gray-300 bg-white text-primary-500" />
                   ログイン状態を保持
                 </label>
-                <Link href="/forgot-password" className="text-primary-400 hover:text-primary-300">
+                <Link href="/forgot-password" className="text-primary-500 hover:text-primary-600">
                   パスワードを忘れた方
                 </Link>
               </div>
@@ -110,9 +110,9 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-dark-400">
+              <p className="text-gray-500">
                 アカウントをお持ちでない方は{' '}
-                <Link href="/register" className="text-primary-400 hover:text-primary-300 font-medium">
+                <Link href="/register" className="text-primary-500 hover:text-primary-600 font-medium">
                   新規登録
                 </Link>
               </p>

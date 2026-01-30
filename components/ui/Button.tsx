@@ -14,10 +14,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
     
     const variants = {
-      primary: 'bg-gradient-to-r from-primary-600 to-accent-orange hover:from-primary-500 hover:to-accent-ember text-white shadow-lg hover:shadow-xl',
-      secondary: 'bg-dark-700 hover:bg-dark-600 text-white border border-dark-500 hover:border-dark-400',
-      ghost: 'bg-transparent hover:bg-white/10 text-white',
-      danger: 'bg-red-600 hover:bg-red-500 text-white shadow-lg hover:shadow-xl',
+      primary: 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 text-white shadow-lg hover:shadow-xl',
+      secondary: 'bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 hover:border-primary-300',
+      ghost: 'bg-transparent hover:bg-primary-50 text-gray-700',
+      danger: 'bg-red-500 hover:bg-red-400 text-white shadow-lg hover:shadow-xl',
     }
 
     const sizes = {

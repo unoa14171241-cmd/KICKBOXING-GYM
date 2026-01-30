@@ -8,7 +8,7 @@ import { Button, Card } from '@/components/ui'
 import { 
   Flame, Target, Users, Trophy, Calendar, 
   ShoppingBag, QrCode, Shield, ArrowRight,
-  Zap, Heart, Clock
+  Zap, Heart, Clock, MapPin
 } from 'lucide-react'
 
 const features = [
@@ -67,15 +67,15 @@ const plans = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pattern-grid">
+      {/* Hero Section - 明るいテーマ */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-primary-50 to-white pt-28">
         {/* Background Effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-orange/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-200/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-300/20 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -85,9 +85,9 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/20 border border-primary-500/30 text-primary-400 text-sm font-medium mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 border border-primary-200 text-primary-600 text-sm font-medium mb-6">
                 <Flame className="w-4 h-4" />
-                最高のキックボクシング体験を
+                茨城県つくばで人気No.1
               </span>
             </motion.div>
 
@@ -95,12 +95,12 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6"
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
               style={{ fontFamily: 'var(--font-bebas)', letterSpacing: '0.05em' }}
             >
-              IGNITE YOUR
-              <span className="block bg-gradient-to-r from-primary-500 via-accent-orange to-accent-gold bg-clip-text text-transparent">
-                FIGHTING SPIRIT
+              KICKBOXING
+              <span className="block bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 bg-clip-text text-transparent">
+                TRIM GYM
               </span>
             </motion.h1>
 
@@ -108,7 +108,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-dark-300 max-w-2xl mx-auto mb-10"
+              className="text-xl text-gray-600 max-w-2xl mx-auto mb-10"
             >
               プロのトレーナーによる完全マンツーマン指導。<br />
               初心者からプロ志望まで、あなたの目標達成をサポートします。
@@ -143,10 +143,10 @@ export default function HomePage() {
           >
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+                <div className="text-4xl md:text-5xl font-bold text-primary-600 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
                   {stat.value}
                 </div>
-                <div className="text-dark-400">{stat.label}</div>
+                <div className="text-gray-500">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -159,7 +159,7 @@ export default function HomePage() {
           transition={{ delay: 1 }}
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
-          <div className="w-6 h-10 rounded-full border-2 border-dark-500 flex items-start justify-center p-2">
+          <div className="w-6 h-10 rounded-full border-2 border-primary-300 flex items-start justify-center p-2">
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -170,14 +170,14 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 relative">
+      <section className="py-24 relative bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
-              WHY CHOOSE BLAZE?
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
+              WHY CHOOSE TRIM GYM?
             </h2>
-            <p className="text-dark-400 max-w-2xl mx-auto">
-              BLAZEが選ばれる理由
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              TRIM GYMが選ばれる理由
             </p>
           </div>
 
@@ -191,11 +191,11 @@ export default function HomePage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card hoverable className="h-full text-center">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-orange/20 flex items-center justify-center">
+                  <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary-100 flex items-center justify-center">
                     <feature.icon className="w-7 h-7 text-primary-500" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-dark-400 text-sm">{feature.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-500 text-sm">{feature.description}</p>
                 </Card>
               </motion.div>
             ))}
@@ -203,14 +203,36 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Shop Banner - TRIM GYM風 */}
+      <section className="py-16 bg-primary-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+                TRIM GYM つくば
+              </h2>
+              <p className="text-white/90 flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
+                茨城県つくば市○○ 1-2-3
+              </p>
+            </div>
+            <Link href="/register">
+              <Button variant="secondary" size="lg" className="bg-white text-primary-600 hover:bg-gray-50">
+                無料体験予約
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Plans Section */}
-      <section className="py-24 relative pattern-dots">
+      <section className="py-24 relative bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
               MEMBERSHIP PLANS
             </h2>
-            <p className="text-dark-400 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto">
               あなたに最適なプランをお選びください
             </p>
           </div>
@@ -225,38 +247,38 @@ export default function HomePage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card 
-                  variant={plan.popular ? 'glow' : 'glass'} 
-                  className={`h-full relative ${plan.popular ? 'scale-105' : ''}`}
+                  variant={plan.popular ? 'pink' : 'default'} 
+                  className={`h-full relative ${plan.popular ? 'scale-105 shadow-xl' : ''}`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="px-4 py-1 rounded-full bg-gradient-to-r from-primary-500 to-accent-orange text-white text-sm font-semibold">
+                      <span className="px-4 py-1 rounded-full bg-white text-primary-500 text-sm font-semibold shadow-lg">
                         人気No.1
                       </span>
                     </div>
                   )}
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                    <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+                      <span className={`text-4xl font-bold ${plan.popular ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'var(--font-bebas)' }}>
                         ¥{plan.price}
                       </span>
-                      <span className="text-dark-400">/月</span>
+                      <span className={plan.popular ? 'text-white/80' : 'text-gray-500'}>/月</span>
                     </div>
-                    <p className="text-primary-400 mt-2">{plan.sessions}</p>
+                    <p className={`mt-2 ${plan.popular ? 'text-white/90' : 'text-primary-500'}`}>{plan.sessions}</p>
                   </div>
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-3 text-dark-300">
-                        <Zap className="w-4 h-4 text-accent-gold" />
+                      <li key={i} className={`flex items-center gap-3 ${plan.popular ? 'text-white/90' : 'text-gray-600'}`}>
+                        <Zap className={`w-4 h-4 ${plan.popular ? 'text-white' : 'text-primary-500'}`} />
                         {feature}
                       </li>
                     ))}
                   </ul>
                   <Link href="/register" className="block">
                     <Button 
-                      variant={plan.popular ? 'primary' : 'secondary'} 
-                      className="w-full"
+                      variant={plan.popular ? 'secondary' : 'primary'} 
+                      className={`w-full ${plan.popular ? 'bg-white text-primary-600 hover:bg-gray-50' : ''}`}
                     >
                       このプランで始める
                     </Button>
@@ -269,8 +291,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 via-accent-orange/20 to-accent-gold/20" />
+      <section className="py-24 relative overflow-hidden bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700">
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -280,11 +301,11 @@ export default function HomePage() {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-bebas)' }}>
               START YOUR JOURNEY TODAY
             </h2>
-            <p className="text-xl text-dark-300 mb-8">
+            <p className="text-xl text-white/90 mb-8">
               まずは無料体験から。あなたの変化がここから始まります。
             </p>
             <Link href="/register">
-              <Button size="lg" className="fire-glow">
+              <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-50 shadow-xl">
                 無料体験を予約する
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
