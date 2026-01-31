@@ -2,15 +2,18 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
-// TRIM GYMのプランデータ
-const trimGymPlans = [
+// TRIM GYMの通常会員プラン
+const membershipPlans = [
   {
     id: 'plan-fulltime',
     name: '一般フルタイム',
     description: '全ての時間帯で利用可能な一般会員向けプラン',
     price: 11000,
     sessionsPerMonth: 0, // 無制限
-    features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能']),
+    features: JSON.stringify({
+      category: 'membership',
+      items: ['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能']
+    }),
     sortOrder: 1,
   },
   {
@@ -18,8 +21,11 @@ const trimGymPlans = [
     name: '学生フルタイム',
     description: '中学生以上の学生向けプラン（学生証必要）',
     price: 8800,
-    sessionsPerMonth: 0, // 無制限
-    features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能', '学生証必要']),
+    sessionsPerMonth: 0,
+    features: JSON.stringify({
+      category: 'membership',
+      items: ['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能', '学生証必要']
+    }),
     sortOrder: 2,
   },
   {
@@ -28,7 +34,10 @@ const trimGymPlans = [
     description: '月4回までの利用が可能なプラン',
     price: 8800,
     sessionsPerMonth: 4,
-    features: JSON.stringify(['月4回まで利用可能', '全クラス参加OK']),
+    features: JSON.stringify({
+      category: 'membership',
+      items: ['月4回まで利用可能', '全クラス参加OK']
+    }),
     sortOrder: 3,
   },
   {
@@ -36,8 +45,11 @@ const trimGymPlans = [
     name: '平日午前会員',
     description: '平日午前中のみ利用可能なお得なプラン',
     price: 6500,
-    sessionsPerMonth: 0, // 無制限
-    features: JSON.stringify(['平日午前のみ利用可能', '午前クラス参加OK']),
+    sessionsPerMonth: 0,
+    features: JSON.stringify({
+      category: 'membership',
+      items: ['平日午前のみ利用可能', '午前クラス参加OK']
+    }),
     sortOrder: 4,
   },
   {
@@ -45,10 +57,190 @@ const trimGymPlans = [
     name: 'キッズ',
     description: '小学生以下のお子様向けプラン',
     price: 6500,
-    sessionsPerMonth: 0, // 無制限
-    features: JSON.stringify(['キッズクラス参加OK', '小学生以下対象']),
+    sessionsPerMonth: 0,
+    features: JSON.stringify({
+      category: 'membership',
+      items: ['キッズクラス参加OK', '小学生以下対象']
+    }),
     sortOrder: 5,
   },
+]
+
+// パーソナルレッスンプラン（30分コース）
+const personal30minPlans = [
+  {
+    id: 'plan-personal-30-4',
+    name: 'パーソナル30分 月4回',
+    description: '30分パーソナルレッスン 月4回コース',
+    price: 16000,
+    sessionsPerMonth: 4,
+    features: JSON.stringify({
+      category: 'personal',
+      duration: 30,
+      type: 'monthly',
+      items: ['30分パーソナルレッスン', '月4回', 'トレーナー指名可能']
+    }),
+    sortOrder: 11,
+  },
+  {
+    id: 'plan-personal-30-6',
+    name: 'パーソナル30分 月6回',
+    description: '30分パーソナルレッスン 月6回コース',
+    price: 21000,
+    sessionsPerMonth: 6,
+    features: JSON.stringify({
+      category: 'personal',
+      duration: 30,
+      type: 'monthly',
+      items: ['30分パーソナルレッスン', '月6回', 'トレーナー指名可能']
+    }),
+    sortOrder: 12,
+  },
+]
+
+// パーソナルレッスンプラン（60分コース）
+const personal60minPlans = [
+  {
+    id: 'plan-personal-60-4',
+    name: 'パーソナル60分 月4回',
+    description: '60分パーソナルレッスン 月4回コース',
+    price: 22000,
+    sessionsPerMonth: 4,
+    features: JSON.stringify({
+      category: 'personal',
+      duration: 60,
+      type: 'monthly',
+      items: ['60分パーソナルレッスン', '月4回', 'トレーナー指名可能']
+    }),
+    sortOrder: 21,
+  },
+  {
+    id: 'plan-personal-60-6',
+    name: 'パーソナル60分 月6回',
+    description: '60分パーソナルレッスン 月6回コース',
+    price: 30000,
+    sessionsPerMonth: 6,
+    features: JSON.stringify({
+      category: 'personal',
+      duration: 60,
+      type: 'monthly',
+      items: ['60分パーソナルレッスン', '月6回', 'トレーナー指名可能']
+    }),
+    sortOrder: 22,
+  },
+]
+
+// 回数券プラン（30分）
+const ticket30minPlans = [
+  {
+    id: 'plan-ticket-30-3',
+    name: '30分回数券 3回',
+    description: '30分パーソナルレッスン 3回券（有効期限3ヶ月）',
+    price: 13500,
+    sessionsPerMonth: 3,
+    durationMonths: 3,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 30,
+      type: 'ticket',
+      validity: '3ヶ月',
+      items: ['30分パーソナルレッスン', '3回分', '有効期限3ヶ月']
+    }),
+    sortOrder: 31,
+  },
+  {
+    id: 'plan-ticket-30-5',
+    name: '30分回数券 5回',
+    description: '30分パーソナルレッスン 5回券（有効期限6ヶ月）',
+    price: 21000,
+    sessionsPerMonth: 5,
+    durationMonths: 6,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 30,
+      type: 'ticket',
+      validity: '6ヶ月',
+      items: ['30分パーソナルレッスン', '5回分', '有効期限6ヶ月']
+    }),
+    sortOrder: 32,
+  },
+  {
+    id: 'plan-ticket-30-10',
+    name: '30分回数券 10回',
+    description: '30分パーソナルレッスン 10回券（有効期限12ヶ月）',
+    price: 40000,
+    sessionsPerMonth: 10,
+    durationMonths: 12,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 30,
+      type: 'ticket',
+      validity: '12ヶ月',
+      items: ['30分パーソナルレッスン', '10回分', '有効期限12ヶ月']
+    }),
+    sortOrder: 33,
+  },
+]
+
+// 回数券プラン（60分）
+const ticket60minPlans = [
+  {
+    id: 'plan-ticket-60-3',
+    name: '60分回数券 3回',
+    description: '60分パーソナルレッスン 3回券（有効期限3ヶ月）',
+    price: 18000,
+    sessionsPerMonth: 3,
+    durationMonths: 3,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 60,
+      type: 'ticket',
+      validity: '3ヶ月',
+      items: ['60分パーソナルレッスン', '3回分', '有効期限3ヶ月']
+    }),
+    sortOrder: 41,
+  },
+  {
+    id: 'plan-ticket-60-5',
+    name: '60分回数券 5回',
+    description: '60分パーソナルレッスン 5回券（有効期限6ヶ月）',
+    price: 28500,
+    sessionsPerMonth: 5,
+    durationMonths: 6,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 60,
+      type: 'ticket',
+      validity: '6ヶ月',
+      items: ['60分パーソナルレッスン', '5回分', '有効期限6ヶ月']
+    }),
+    sortOrder: 42,
+  },
+  {
+    id: 'plan-ticket-60-10',
+    name: '60分回数券 10回',
+    description: '60分パーソナルレッスン 10回券（有効期限12ヶ月）',
+    price: 54000,
+    sessionsPerMonth: 10,
+    durationMonths: 12,
+    features: JSON.stringify({
+      category: 'ticket',
+      duration: 60,
+      type: 'ticket',
+      validity: '12ヶ月',
+      items: ['60分パーソナルレッスン', '10回分', '有効期限12ヶ月']
+    }),
+    sortOrder: 43,
+  },
+]
+
+// 全プランを結合
+const allPlans = [
+  ...membershipPlans,
+  ...personal30minPlans,
+  ...personal60minPlans,
+  ...ticket30minPlans,
+  ...ticket60minPlans,
 ]
 
 // 本番環境でのシードデータ投入用API
@@ -56,13 +248,11 @@ export async function POST(request: Request) {
   try {
     const { secretKey, force } = await request.json()
     
-    // シークレットキーの検証（環境変数またはデフォルト値）
     const validKey = process.env.SEED_SECRET_KEY || 'kickboxing-gym-seed-2024'
     if (secretKey !== validKey) {
       return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 })
     }
 
-    // forceオプションがある場合は既存データがあっても更新
     if (!force) {
       const existingPlans = await prisma.plan.count()
       if (existingPlans > 0) {
@@ -75,7 +265,7 @@ export async function POST(request: Request) {
 
     // プランを作成/更新
     const plans = await Promise.all(
-      trimGymPlans.map(plan => 
+      allPlans.map(plan => 
         prisma.plan.upsert({
           where: { id: plan.id },
           update: {
@@ -83,13 +273,20 @@ export async function POST(request: Request) {
             description: plan.description,
             price: plan.price,
             sessionsPerMonth: plan.sessionsPerMonth,
+            durationMonths: plan.durationMonths || 1,
             features: plan.features,
             sortOrder: plan.sortOrder,
             isActive: true,
           },
           create: {
-            ...plan,
-            durationMonths: 1,
+            id: plan.id,
+            name: plan.name,
+            description: plan.description,
+            price: plan.price,
+            sessionsPerMonth: plan.sessionsPerMonth,
+            durationMonths: plan.durationMonths || 1,
+            features: plan.features,
+            sortOrder: plan.sortOrder,
             isActive: true,
           },
         })
@@ -98,7 +295,7 @@ export async function POST(request: Request) {
 
     // 管理者ユーザーを作成
     const hashedPassword = await bcrypt.hash('admin123', 12)
-    const adminUser = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { email: 'admin@trim-gym.jp' },
       update: {},
       create: {
@@ -164,36 +361,16 @@ export async function POST(request: Request) {
       })
     }
 
-    // サンプルイベントを作成
-    const nextMonth = new Date()
-    nextMonth.setMonth(nextMonth.getMonth() + 1)
-
-    await prisma.event.upsert({
-      where: { id: 'event-1' },
-      update: {},
-      create: {
-        id: 'event-1',
-        title: 'キックボクシング入門セミナー',
-        description: '初心者向けのキックボクシング基礎セミナーです。',
-        date: nextMonth,
-        startTime: '14:00',
-        endTime: '16:00',
-        location: 'TRIM GYM メインスタジオ',
-        capacity: 20,
-        price: 0,
-        eventType: 'seminar',
-        isPublished: true,
-      },
-    })
-
     return NextResponse.json({
       success: true,
       message: 'TRIM GYMデータの投入が完了しました',
       data: {
         plans: plans.length,
+        membershipPlans: membershipPlans.length,
+        personalPlans: personal30minPlans.length + personal60minPlans.length,
+        ticketPlans: ticket30minPlans.length + ticket60minPlans.length,
         trainers: trainers.length,
         products: products.length,
-        events: 1,
       },
     })
   } catch (error) {
@@ -205,7 +382,7 @@ export async function POST(request: Request) {
   }
 }
 
-// GETでステータス確認 & 簡易シード実行
+// GETでステータス確認 & プランがない場合は自動シード
 export async function GET() {
   try {
     const [plansCount, trainersCount, productsCount, eventsCount, usersCount] = await Promise.all([
@@ -218,22 +395,26 @@ export async function GET() {
 
     // プランがない場合は自動でシード
     if (plansCount === 0) {
-      // プランを作成
       await Promise.all(
-        trimGymPlans.map(plan => 
+        allPlans.map(plan => 
           prisma.plan.upsert({
             where: { id: plan.id },
             update: {},
             create: {
-              ...plan,
-              durationMonths: 1,
+              id: plan.id,
+              name: plan.name,
+              description: plan.description,
+              price: plan.price,
+              sessionsPerMonth: plan.sessionsPerMonth,
+              durationMonths: plan.durationMonths || 1,
+              features: plan.features,
+              sortOrder: plan.sortOrder,
               isActive: true,
             },
           })
         )
       )
 
-      // 管理者を作成
       const hashedPassword = await bcrypt.hash('admin123', 12)
       await prisma.user.upsert({
         where: { email: 'admin@trim-gym.jp' },
@@ -249,7 +430,7 @@ export async function GET() {
         initialized: true,
         message: '初期データを自動投入しました',
         counts: {
-          plans: trimGymPlans.length,
+          plans: allPlans.length,
           trainers: 0,
           products: 0,
           events: 0,
@@ -258,11 +439,34 @@ export async function GET() {
       })
     }
 
-    // プランリストも返す
+    // プランリストも返す（カテゴリ別）
     const plans = await prisma.plan.findMany({
+      where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
-      select: { id: true, name: true, price: true, sessionsPerMonth: true },
+      select: { id: true, name: true, price: true, sessionsPerMonth: true, features: true },
     })
+
+    // カテゴリ別に分類
+    const categorizedPlans = {
+      membership: plans.filter(p => {
+        try {
+          const f = JSON.parse(p.features || '{}')
+          return f.category === 'membership'
+        } catch { return false }
+      }),
+      personal: plans.filter(p => {
+        try {
+          const f = JSON.parse(p.features || '{}')
+          return f.category === 'personal'
+        } catch { return false }
+      }),
+      ticket: plans.filter(p => {
+        try {
+          const f = JSON.parse(p.features || '{}')
+          return f.category === 'ticket'
+        } catch { return false }
+      }),
+    }
 
     return NextResponse.json({
       initialized: plansCount > 0,
@@ -273,7 +477,7 @@ export async function GET() {
         events: eventsCount,
         users: usersCount,
       },
-      plans,
+      categorizedPlans,
     })
   } catch (error) {
     return NextResponse.json(

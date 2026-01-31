@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Card, Button, Badge } from '@/components/ui'
-import { ShoppingBag, Package, Filter, ArrowRight } from 'lucide-react'
+import { ShoppingBag, Package, Filter, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 interface Product {
@@ -16,6 +15,7 @@ interface Product {
   price: number
   category: string
   stock: number
+  isActive: boolean
 }
 
 const categories = [
@@ -23,89 +23,57 @@ const categories = [
   { id: 'gloves', label: 'グローブ' },
   { id: 'wraps', label: 'バンテージ' },
   { id: 'apparel', label: 'アパレル' },
+  { id: 'accessories', label: 'アクセサリー' },
   { id: 'supplements', label: 'サプリメント' },
 ]
 
-// デモ商品データ
-const demoProducts: Product[] = [
-  {
-    id: '1',
-    name: 'BLAZEオリジナルグローブ 14oz',
-    description: 'トレーニング用高品質ボクシンググローブ。手首のサポート力が高く、長時間の使用でも快適です。',
-    price: 12800,
-    category: 'gloves',
-    stock: 20,
-  },
-  {
-    id: '2',
-    name: 'BLAZEオリジナルグローブ 16oz',
-    description: 'スパーリング用ボクシンググローブ。クッション性が高く安全にトレーニングできます。',
-    price: 14800,
-    category: 'gloves',
-    stock: 15,
-  },
-  {
-    id: '3',
-    name: 'バンテージ 4.5m',
-    description: '伸縮性のある練習用バンテージ。手首と拳をしっかり保護します。',
-    price: 1500,
-    category: 'wraps',
-    stock: 50,
-  },
-  {
-    id: '4',
-    name: 'BLAZEドライTシャツ',
-    description: '吸汗速乾素材のトレーニングTシャツ。BLAZEロゴ入り。',
-    price: 4500,
-    category: 'apparel',
-    stock: 30,
-  },
-  {
-    id: '5',
-    name: 'ホエイプロテイン 1kg',
-    description: '高品質ホエイプロテイン。トレーニング後の筋肉回復をサポート。',
-    price: 5800,
-    category: 'supplements',
-    stock: 25,
-  },
-]
+const categoryLabels: Record<string, string> = {
+  gloves: 'グローブ',
+  wraps: 'バンテージ',
+  apparel: 'アパレル',
+  accessories: 'アクセサリー',
+  supplements: 'サプリメント',
+}
 
 export default function ShopPage() {
-  const [products, setProducts] = useState<Product[]>(demoProducts)
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState('all')
 
   useEffect(() => {
-    const url = selectedCategory === 'all'
-      ? '/api/products'
-      : `/api/products?category=${selectedCategory}`
-    
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        if (data.products && data.products.length > 0) {
-          setProducts(data.products)
-        }
-      })
-      .catch(() => {
-        // APIエラー時はデモデータを使用
-      })
-  }, [selectedCategory])
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('/api/products')
+        if (!res.ok) throw new Error('商品情報の取得に失敗しました')
+        const data = await res.json()
+        setProducts(data.filter((p: Product) => p.isActive))
+      } catch (err) {
+        setError('商品情報を取得できませんでした')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
 
   const filteredProducts = selectedCategory === 'all'
     ? products
     : products.filter(p => p.category === selectedCategory)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 pattern-grid">
+      <section className="pt-32 pb-16 bg-gradient-to-b from-primary-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-4"
+            className="text-5xl md:text-6xl font-bold text-gray-900 mb-4"
             style={{ fontFamily: 'var(--font-bebas)' }}
           >
             SHOP
@@ -114,97 +82,123 @@ export default function ShopPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-dark-400"
+            className="text-xl text-gray-600"
           >
-            トレーニングに必要なギアをオンラインで購入
+            トレーニング用品・オリジナルグッズ
           </motion.p>
         </div>
       </section>
 
-      {/* Shop */}
-      <section className="py-16">
+      {/* Categories */}
+      <section className="py-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Category Filter */}
-          <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2">
-            <Filter className="w-5 h-5 text-dark-400 flex-shrink-0" />
-            {categories.map((category) => (
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <Filter className="w-5 h-5 text-gray-400 flex-shrink-0" />
+            {categories.map(cat => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === category.id
+                  selectedCategory === cat.id
                     ? 'bg-primary-500 text-white'
-                    : 'bg-dark-700 text-dark-300 hover:bg-dark-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {category.label}
+                {cat.label}
               </button>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Products Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card hoverable className="h-full flex flex-col">
-                  {/* Product Image */}
-                  <div className="aspect-square rounded-xl bg-gradient-to-br from-dark-700 to-dark-800 mb-4 flex items-center justify-center">
-                    <Package className="w-16 h-16 text-dark-500" />
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-white">{product.name}</h3>
-                      <Badge variant="default">
-                        {categories.find(c => c.id === product.category)?.label || product.category}
-                      </Badge>
+      {/* Products */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+              <span className="ml-3 text-gray-600">読み込み中...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500">{error}</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20">
+              <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500">
+                {selectedCategory === 'all' 
+                  ? '現在商品はありません' 
+                  : 'このカテゴリーの商品はありません'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card hoverable className="h-full flex flex-col">
+                    <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                      <Package className="w-16 h-16 text-gray-400" />
                     </div>
+
+                    <div className="flex items-start justify-between mb-2">
+                      <Badge className="bg-gray-100 text-gray-600">
+                        {categoryLabels[product.category] || product.category}
+                      </Badge>
+                      {product.stock <= 5 && product.stock > 0 && (
+                        <span className="text-xs text-orange-500">残りわずか</span>
+                      )}
+                      {product.stock === 0 && (
+                        <span className="text-xs text-red-500">在庫切れ</span>
+                      )}
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+
                     {product.description && (
-                      <p className="text-sm text-dark-400 mb-4 line-clamp-2">
+                      <p className="text-gray-500 text-sm mb-4 line-clamp-2">
                         {product.description}
                       </p>
                     )}
-                  </div>
 
-                  {/* Price & Action */}
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-dark-700">
-                    <span className="text-xl font-bold text-white">
-                      {formatCurrency(product.price)}
-                    </span>
-                    <Link href="/login">
-                      <Button size="sm">
-                        購入する
-                        <ArrowRight className="ml-1 w-4 h-4" />
+                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {formatCurrency(product.price)}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        disabled={product.stock === 0}
+                        className={product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}
+                      >
+                        <ShoppingBag className="w-4 h-4 mr-1" />
+                        {product.stock === 0 ? '売切れ' : '購入'}
                       </Button>
-                    </Link>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
-          {/* Login Prompt */}
-          <div className="mt-12 text-center">
-            <Card variant="glass" className="inline-block p-8">
-              <ShoppingBag className="w-12 h-12 text-primary-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">会員価格でお得に購入</h3>
-              <p className="text-dark-400 mb-4">
-                会員登録すると、全商品10%OFFでご購入いただけます
-              </p>
-              <Link href="/register">
-                <Button>
-                  会員登録する
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-            </Card>
-          </div>
+      {/* Info */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            ご購入について
+          </h2>
+          <p className="text-gray-600">
+            商品のご購入はジム受付にて承っております。<br />
+            会員の方は会員価格にてご購入いただけます。
+          </p>
         </div>
       </section>
 

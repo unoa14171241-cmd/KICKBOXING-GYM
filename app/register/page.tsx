@@ -6,13 +6,18 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Button, Input, Card } from '@/components/ui'
 import { Navbar } from '@/components/layout/Navbar'
-import { User, Mail, Lock, Phone, Calendar, ArrowRight, Flame, CheckCircle } from 'lucide-react'
+import { Footer } from '@/components/layout/Footer'
+import { User, Mail, Lock, Phone, Calendar, ArrowRight, Flame, CheckCircle, Loader2 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 interface Plan {
   id: string
   name: string
+  description: string
   price: number
   sessionsPerMonth: number
+  category: string
+  features: string[]
 }
 
 export default function RegisterPage() {
@@ -21,6 +26,8 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [plans, setPlans] = useState<Plan[]>([])
+  const [plansLoading, setPlansLoading] = useState(true)
+  const [plansError, setPlansError] = useState('')
   
   const [formData, setFormData] = useState({
     email: '',
@@ -36,20 +43,17 @@ export default function RegisterPage() {
     planId: '',
   })
 
-  const [plansLoading, setPlansLoading] = useState(true)
-  const [plansError, setPlansError] = useState('')
-
   useEffect(() => {
-    // プラン一覧を取得
+    // 通常会員プラン一覧を取得
     setPlansLoading(true)
     setPlansError('')
-    fetch('/api/plans')
+    fetch('/api/plans?category=membership')
       .then(res => {
         if (!res.ok) throw new Error('プランの取得に失敗しました')
         return res.json()
       })
       .then(data => {
-        setPlans(data.plans || [])
+        setPlans(data)
         setPlansLoading(false)
       })
       .catch(err => {
@@ -99,29 +103,29 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen pattern-grid">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
       <Navbar />
       
-      <div className="flex items-center justify-center min-h-screen px-4 py-24">
+      <div className="flex items-center justify-center min-h-screen px-4 py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-2xl"
         >
-          <Card variant="glass" className="p-8">
+          <Card className="p-8 shadow-xl">
             {/* Progress Indicator */}
             <div className="flex items-center justify-center mb-8">
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
                     step >= s 
-                      ? 'bg-gradient-to-r from-primary-500 to-accent-orange text-white' 
-                      : 'bg-dark-700 text-dark-400'
+                      ? 'bg-primary-500 text-white' 
+                      : 'bg-gray-200 text-gray-400'
                   }`}>
                     {step > s ? <CheckCircle className="w-5 h-5" /> : s}
                   </div>
                   {s < 3 && (
-                    <div className={`w-16 h-1 mx-2 rounded ${step > s ? 'bg-primary-500' : 'bg-dark-700'}`} />
+                    <div className={`w-16 h-1 mx-2 rounded ${step > s ? 'bg-primary-500' : 'bg-gray-200'}`} />
                   )}
                 </div>
               ))}
@@ -130,15 +134,18 @@ export default function RegisterPage() {
             {step === 1 && (
               <>
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
-                    CREATE ACCOUNT
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-500 flex items-center justify-center">
+                    <Flame className="w-8 h-8 text-white" />
+                  </div>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+                    会員登録
                   </h1>
-                  <p className="text-dark-400">基本情報を入力してください</p>
+                  <p className="text-gray-500">基本情報を入力してください</p>
                 </div>
 
                 <form onSubmit={(e) => { e.preventDefault(); setStep(2); }} className="space-y-6">
                   {error && (
-                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
                       {error}
                     </div>
                   )}
@@ -176,7 +183,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
                       type="email"
                       name="email"
@@ -189,7 +196,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
                       type="tel"
                       name="phone"
@@ -203,7 +210,7 @@ export default function RegisterPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <Input
                         type="date"
                         name="dateOfBirth"
@@ -216,7 +223,7 @@ export default function RegisterPage() {
                       name="gender"
                       value={formData.gender}
                       onChange={handleChange}
-                      className="input"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
                       <option value="">性別を選択</option>
                       <option value="male">男性</option>
@@ -226,7 +233,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
                       type="password"
                       name="password"
@@ -240,7 +247,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
                       type="password"
                       name="confirmPassword"
@@ -264,23 +271,23 @@ export default function RegisterPage() {
             {step === 2 && (
               <>
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
-                    SELECT PLAN
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+                    プラン選択
                   </h1>
-                  <p className="text-dark-400">プランを選択してください</p>
+                  <p className="text-gray-500">ご希望のプランを選択してください</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {error && (
-                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
                       {error}
                     </div>
                   )}
                   
-                  <div className="grid gap-4">
+                  <div className="space-y-3">
                     {plansLoading ? (
-                      <div className="text-center py-8 text-dark-400">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 border-t-transparent mx-auto mb-4" />
+                      <div className="text-center py-8 text-gray-500">
+                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-500" />
                         <p>プランを読み込み中...</p>
                       </div>
                     ) : plans.length > 0 ? (
@@ -289,8 +296,8 @@ export default function RegisterPage() {
                           key={plan.id}
                           className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
                             formData.planId === plan.id
-                              ? 'border-primary-500 bg-primary-500/10'
-                              : 'border-dark-200 hover:border-dark-300'
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200 hover:border-gray-300 bg-white'
                           }`}
                         >
                           <input
@@ -303,22 +310,25 @@ export default function RegisterPage() {
                           />
                           <div className="flex items-center justify-between">
                             <div>
-                              <h3 className="font-semibold text-dark-900">{plan.name}</h3>
-                              <p className="text-sm text-dark-500">
-                                月{plan.sessionsPerMonth === 0 ? '無制限' : `${plan.sessionsPerMonth}回`}
+                              <h3 className="font-semibold text-gray-900">{plan.name}</h3>
+                              <p className="text-sm text-gray-500">
+                                {plan.sessionsPerMonth === 0 ? '無制限' : `月${plan.sessionsPerMonth}回`}
                               </p>
+                              {plan.description && (
+                                <p className="text-xs text-gray-400 mt-1">{plan.description}</p>
+                              )}
                             </div>
                             <div className="text-right">
-                              <span className="text-2xl font-bold text-dark-900">
-                                ¥{plan.price.toLocaleString()}
+                              <span className="text-2xl font-bold text-gray-900">
+                                {formatCurrency(plan.price)}
                               </span>
-                              <span className="text-dark-500">/月</span>
+                              <span className="text-gray-500 text-sm">/月</span>
                             </div>
                           </div>
                         </label>
                       ))
                     ) : (
-                      <div className="text-center py-8 text-dark-500">
+                      <div className="text-center py-8 text-gray-500">
                         {plansError && (
                           <p className="text-yellow-600 mb-2">{plansError}</p>
                         )}
@@ -326,6 +336,12 @@ export default function RegisterPage() {
                         <p className="text-sm mt-2">まずはアカウントを作成しましょう</p>
                       </div>
                     )}
+                  </div>
+
+                  <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
+                    <p className="font-medium text-gray-700 mb-2">入会金について</p>
+                    <p>入会金 ¥15,000 が別途必要です。</p>
+                    <p className="text-primary-600 font-medium">体験当日のご入会で入会金半額！</p>
                   </div>
 
                   <div className="flex gap-4">
@@ -343,15 +359,15 @@ export default function RegisterPage() {
 
             {step === 3 && (
               <div className="text-center py-8">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500 flex items-center justify-center">
                   <CheckCircle className="w-10 h-10 text-white" />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
-                  WELCOME TO BLAZE!
+                <h1 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
+                  登録完了！
                 </h1>
-                <p className="text-dark-400 mb-8">
+                <p className="text-gray-600 mb-8">
                   会員登録が完了しました。<br />
-                  ログインしてトレーニングを始めましょう！
+                  ログインしてマイページをご確認ください。
                 </p>
                 <Link href="/login">
                   <Button>
@@ -364,9 +380,9 @@ export default function RegisterPage() {
 
             {step < 3 && (
               <div className="mt-8 text-center">
-                <p className="text-dark-400">
+                <p className="text-gray-500">
                   既にアカウントをお持ちの方は{' '}
-                  <Link href="/login" className="text-primary-400 hover:text-primary-300 font-medium">
+                  <Link href="/login" className="text-primary-500 hover:text-primary-600 font-medium">
                     ログイン
                   </Link>
                 </p>
@@ -375,6 +391,8 @@ export default function RegisterPage() {
           </Card>
         </motion.div>
       </div>
+
+      <Footer />
     </div>
   )
 }

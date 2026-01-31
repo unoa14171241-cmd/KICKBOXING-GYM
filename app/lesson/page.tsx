@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/layout/Navbar'
@@ -7,35 +8,28 @@ import { Footer } from '@/components/layout/Footer'
 import { Button, Card } from '@/components/ui'
 import { 
   Clock, ArrowRight, Users, Baby, Calendar,
-  Star, MessageCircle, Sparkles
+  Star, MessageCircle, Sparkles, Loader2
 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
-const course30min = {
-  title: '30分コース',
-  trial: { original: '4,500', discounted: '2,500' },
-  monthly: [
-    { name: '月4回', price: '16,000', perSession: '4,000' },
-    { name: '月6回', price: '21,000', perSession: '3,500' },
-  ],
-  tickets: [
-    { count: '3回券', price: '13,500', perSession: '4,500', validity: '3ヶ月' },
-    { count: '5回券', price: '21,000', perSession: '4,200', validity: '6ヶ月' },
-    { count: '10回券', price: '40,000', perSession: '4,000', validity: '12ヶ月' },
-  ],
+interface Plan {
+  id: string
+  name: string
+  description: string
+  price: number
+  sessionsPerMonth: number
+  durationMonths: number
+  category: string
+  duration?: number
+  type?: string
+  validity?: string
+  features: string[]
 }
 
-const course60min = {
-  title: '60分コース',
-  trial: { original: '6,000', discounted: '3,500' },
-  monthly: [
-    { name: '月4回', price: '22,000', perSession: '5,500' },
-    { name: '月6回', price: '30,000', perSession: '5,000' },
-  ],
-  tickets: [
-    { count: '3回券', price: '18,000', perSession: '6,000', validity: '3ヶ月' },
-    { count: '5回券', price: '28,500', perSession: '5,700', validity: '6ヶ月' },
-    { count: '10回券', price: '54,000', perSession: '5,400', validity: '12ヶ月' },
-  ],
+// 体験レッスン料金（静的）
+const trialPrices = {
+  30: { original: 4500, discounted: 2500 },
+  60: { original: 6000, discounted: 3500 },
 }
 
 const notes = [
@@ -46,7 +40,17 @@ const notes = [
   { icon: MessageCircle, text: 'ペアや複数人でのレッスンも可能ですのでお問い合わせください。' },
 ]
 
-function CourseSection({ course, delay = 0 }: { course: typeof course30min; delay?: number }) {
+interface CourseSectionProps {
+  title: string
+  duration: number
+  monthlyPlans: Plan[]
+  ticketPlans: Plan[]
+  delay?: number
+}
+
+function CourseSection({ title, duration, monthlyPlans, ticketPlans, delay = 0 }: CourseSectionProps) {
+  const trial = trialPrices[duration as keyof typeof trialPrices] || trialPrices[30]
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -59,7 +63,7 @@ function CourseSection({ course, delay = 0 }: { course: typeof course30min; dela
         <div className="bg-primary-500 text-white px-6 py-4 -mx-6 -mt-6 mb-6">
           <h3 className="text-2xl font-bold flex items-center gap-2">
             <Clock className="w-6 h-6" />
-            {course.title}
+            {title}
           </h3>
         </div>
 
@@ -70,66 +74,110 @@ function CourseSection({ course, delay = 0 }: { course: typeof course30min; dela
             体験レッスン
           </h4>
           <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-4 flex items-center justify-center gap-4">
-            <span className="text-gray-400 line-through text-xl">¥{course.trial.original}</span>
+            <span className="text-gray-400 line-through text-xl">{formatCurrency(trial.original)}</span>
             <ArrowRight className="w-5 h-5 text-primary-500" />
-            <span className="text-3xl font-bold text-primary-600">¥{course.trial.discounted}</span>
+            <span className="text-3xl font-bold text-primary-600">{formatCurrency(trial.discounted)}</span>
           </div>
         </div>
 
         {/* 月額プラン */}
-        <div className="mb-8">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">◆ コース料金</h4>
-          <div className="space-y-3">
-            {course.monthly.map((plan, index) => (
-              <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
-                <span className="font-medium text-gray-900">{plan.name}</span>
-                <div className="text-right">
-                  <span className="text-2xl font-bold text-gray-900">¥{plan.price}</span>
-                  <span className="text-sm text-gray-500 ml-2">（1回あたり¥{plan.perSession}）</span>
-                </div>
-              </div>
-            ))}
+        {monthlyPlans.length > 0 && (
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">◆ コース料金</h4>
+            <div className="space-y-3">
+              {monthlyPlans.map((plan) => {
+                const perSession = plan.sessionsPerMonth > 0 
+                  ? Math.round(plan.price / plan.sessionsPerMonth)
+                  : plan.price
+                return (
+                  <div key={plan.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+                    <span className="font-medium text-gray-900">月{plan.sessionsPerMonth}回</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-gray-900">{formatCurrency(plan.price)}</span>
+                      <span className="text-sm text-gray-500 ml-2">（1回あたり{formatCurrency(perSession)}）</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 回数券 */}
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">◆ 回数券</h4>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-3 px-4 text-left font-semibold text-gray-700 rounded-tl-lg">回数券</th>
-                  <th className="py-3 px-4 text-right font-semibold text-gray-700">料金</th>
-                  <th className="py-3 px-4 text-right font-semibold text-gray-700 rounded-tr-lg">有効期限</th>
-                </tr>
-              </thead>
-              <tbody>
-                {course.tickets.map((ticket, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="py-3 px-4 text-gray-900 font-medium">{ticket.count}</td>
-                    <td className="py-3 px-4 text-right">
-                      <span className="font-bold text-gray-900">¥{ticket.price}</span>
-                      <span className="text-sm text-gray-500 block">（1回あたり¥{ticket.perSession}）</span>
-                    </td>
-                    <td className="py-3 px-4 text-right text-gray-600">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {ticket.validity}
-                      </span>
-                    </td>
+        {ticketPlans.length > 0 && (
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">◆ 回数券</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="py-3 px-4 text-left font-semibold text-gray-700 rounded-tl-lg">回数券</th>
+                    <th className="py-3 px-4 text-right font-semibold text-gray-700">料金</th>
+                    <th className="py-3 px-4 text-right font-semibold text-gray-700 rounded-tr-lg">有効期限</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {ticketPlans.map((plan, index) => {
+                    const perSession = plan.sessionsPerMonth > 0 
+                      ? Math.round(plan.price / plan.sessionsPerMonth)
+                      : plan.price
+                    return (
+                      <tr key={plan.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="py-3 px-4 text-gray-900 font-medium">{plan.sessionsPerMonth}回券</td>
+                        <td className="py-3 px-4 text-right">
+                          <span className="font-bold text-gray-900">{formatCurrency(plan.price)}</span>
+                          <span className="text-sm text-gray-500 block">（1回あたり{formatCurrency(perSession)}）</span>
+                        </td>
+                        <td className="py-3 px-4 text-right text-gray-600">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {plan.validity || `${plan.durationMonths}ヶ月`}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
     </motion.div>
   )
 }
 
 export default function LessonPage() {
+  const [personalPlans, setPersonalPlans] = useState<Plan[]>([])
+  const [ticketPlans, setTicketPlans] = useState<Plan[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/plans?category=personal').then(res => res.json()),
+      fetch('/api/plans?category=ticket').then(res => res.json()),
+    ])
+      .then(([personal, tickets]) => {
+        setPersonalPlans(personal)
+        setTicketPlans(tickets)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Plans fetch error:', err)
+        setLoading(false)
+      })
+  }, [])
+
+  // 30分と60分のプランを分類
+  const plans30min = {
+    monthly: personalPlans.filter(p => p.duration === 30),
+    tickets: ticketPlans.filter(p => p.duration === 30),
+  }
+  const plans60min = {
+    monthly: personalPlans.filter(p => p.duration === 60),
+    tickets: ticketPlans.filter(p => p.duration === 60),
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -176,10 +224,28 @@ export default function LessonPage() {
       {/* コース料金 */}
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <CourseSection course={course30min} delay={0} />
-            <CourseSection course={course60min} delay={0.1} />
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8">
+              <CourseSection 
+                title="30分コース" 
+                duration={30}
+                monthlyPlans={plans30min.monthly}
+                ticketPlans={plans30min.tickets}
+                delay={0} 
+              />
+              <CourseSection 
+                title="60分コース" 
+                duration={60}
+                monthlyPlans={plans60min.monthly}
+                ticketPlans={plans60min.tickets}
+                delay={0.1} 
+              />
+            </div>
+          )}
         </div>
       </section>
 

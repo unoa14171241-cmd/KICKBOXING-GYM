@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Card, Button, Badge } from '@/components/ui'
-import { CalendarDays, MapPin, Clock, Users, Trophy, ArrowRight } from 'lucide-react'
+import { CalendarDays, MapPin, Clock, Users, Trophy, ArrowRight, Loader2 } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 
 interface Event {
@@ -32,76 +32,56 @@ const eventTypeLabels: Record<string, string> = {
   social: '交流会',
 }
 
-// デモイベントデータ
-const demoEvents: Event[] = [
-  {
-    id: '1',
-    title: 'キックボクシング入門セミナー',
-    description: '初心者向けのキックボクシング基礎セミナーです。基本的なスタンスやパンチ、キックの打ち方を学びます。',
-    date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    startTime: '14:00',
-    endTime: '16:00',
-    location: 'BLAZE GYM メインスタジオ',
-    capacity: 20,
-    price: 0,
-    eventType: 'seminar',
-    _count: { registrations: 8 },
-  },
-  {
-    id: '2',
-    title: 'スパーリング大会',
-    description: '会員同士でのスパーリング大会。経験レベルに応じたマッチングで安全に試合を楽しめます。',
-    date: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
-    startTime: '10:00',
-    endTime: '17:00',
-    location: 'BLAZE GYM メインスタジオ',
-    capacity: 30,
-    price: 3000,
-    eventType: 'competition',
-    _count: { registrations: 15 },
-  },
-  {
-    id: '3',
-    title: 'ミット打ちワークショップ',
-    description: 'プロトレーナーによるミット打ちの実践ワークショップ。コンビネーションの組み立て方を学びます。',
-    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-    startTime: '19:00',
-    endTime: '21:00',
-    location: 'BLAZE GYM メインスタジオ',
-    capacity: 15,
-    price: 2000,
-    eventType: 'workshop',
-    _count: { registrations: 10 },
-  },
-]
+const eventTypeColors: Record<string, string> = {
+  seminar: 'bg-blue-100 text-blue-700',
+  competition: 'bg-red-100 text-red-700',
+  workshop: 'bg-green-100 text-green-700',
+  social: 'bg-purple-100 text-purple-700',
+}
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(demoEvents)
+  const [events, setEvents] = useState<Event[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/events')
-      .then(res => res.json())
-      .then(data => {
-        if (data.events && data.events.length > 0) {
-          setEvents(data.events)
-        }
-      })
-      .catch(() => {
-        // APIエラー時はデモデータを使用
-      })
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('/api/events')
+        if (!res.ok) throw new Error('イベント情報の取得に失敗しました')
+        const data = await res.json()
+        setEvents(data)
+      } catch (err) {
+        setError('イベント情報を取得できませんでした')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchEvents()
   }, [])
 
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'competition':
+        return Trophy
+      default:
+        return CalendarDays
+    }
+  }
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 pattern-grid">
+      <section className="pt-32 pb-16 bg-gradient-to-b from-primary-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-4"
+            className="text-5xl md:text-6xl font-bold text-gray-900 mb-4"
             style={{ fontFamily: 'var(--font-bebas)' }}
           >
             EVENTS
@@ -110,94 +90,115 @@ export default function EventsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-dark-400"
+            className="text-xl text-gray-600"
           >
-            セミナー、大会、ワークショップなど様々なイベントを開催
+            イベント・セミナー情報
           </motion.p>
         </div>
       </section>
 
       {/* Events List */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {events.length > 0 ? (
-            <div className="space-y-6">
-              {events.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card hoverable className="overflow-hidden">
-                    <div className="flex flex-col md:flex-row gap-6">
-                      {/* Event Image */}
-                      <div className="md:w-48 h-48 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-orange/20 flex items-center justify-center flex-shrink-0">
-                        <Trophy className="w-16 h-16 text-primary-500" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+              <span className="ml-3 text-gray-600">読み込み中...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500">{error}</p>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-20">
+              <CalendarDays className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500">現在予定されているイベントはありません</p>
+              <p className="text-gray-400 text-sm mt-2">新しいイベントが追加されるまでお待ちください</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {events.map((event, index) => {
+                const EventIcon = getEventIcon(event.eventType)
+                const remainingSpots = event.capacity 
+                  ? event.capacity - (event._count?.registrations || 0)
+                  : null
+
+                return (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card hoverable className="h-full flex flex-col">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
+                          <EventIcon className="w-6 h-6 text-primary-600" />
+                        </div>
+                        <Badge className={eventTypeColors[event.eventType] || 'bg-gray-100 text-gray-700'}>
+                          {eventTypeLabels[event.eventType] || event.eventType}
+                        </Badge>
                       </div>
 
-                      {/* Event Info */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div>
-                            <Badge variant="info" className="mb-2">
-                              {eventTypeLabels[event.eventType] || event.eventType}
-                            </Badge>
-                            <h3 className="text-xl font-semibold text-white">{event.title}</h3>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-white">
-                              {event.price === 0 ? '無料' : formatCurrency(event.price)}
-                            </span>
-                          </div>
-                        </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {event.title}
+                      </h3>
 
-                        {event.description && (
-                          <p className="text-dark-400 mb-4 line-clamp-2">
-                            {event.description}
-                          </p>
+                      {event.description && (
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                          {event.description}
+                        </p>
+                      )}
+
+                      <div className="space-y-2 text-sm text-gray-500 mb-4">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="w-4 h-4" />
+                          <span>{formatDate(event.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{event.startTime} - {event.endTime}</span>
+                        </div>
+                        {event.location && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            <span>{event.location}</span>
+                          </div>
                         )}
-
-                        <div className="flex flex-wrap gap-4 text-sm text-dark-400 mb-4">
-                          <span className="flex items-center gap-1">
-                            <CalendarDays className="w-4 h-4 text-primary-500" />
-                            {formatDate(event.date)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4 text-primary-500" />
-                            {event.startTime} - {event.endTime}
-                          </span>
-                          {event.location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4 text-primary-500" />
-                              {event.location}
+                        {event.capacity && (
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            <span>
+                              定員 {event.capacity}名
+                              {remainingSpots !== null && remainingSpots > 0 && (
+                                <span className="text-primary-500 ml-1">
+                                  （残り{remainingSpots}名）
+                                </span>
+                              )}
+                              {remainingSpots !== null && remainingSpots <= 0 && (
+                                <span className="text-red-500 ml-1">（満員）</span>
+                              )}
                             </span>
-                          )}
-                          {event.capacity && (
-                            <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4 text-primary-500" />
-                              {event._count?.registrations || 0}/{event.capacity}名
-                            </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
+                      </div>
 
-                        <Link href="/login">
+                      <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <span className="text-2xl font-bold text-gray-900">
+                          {event.price === 0 ? '無料' : formatCurrency(event.price)}
+                        </span>
+                        <Link href={`/events/${event.id}`}>
                           <Button size="sm">
-                            参加申込
-                            <ArrowRight className="ml-2 w-4 h-4" />
+                            詳細を見る
+                            <ArrowRight className="ml-1 w-4 h-4" />
                           </Button>
                         </Link>
                       </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                    </Card>
+                  </motion.div>
+                )
+              })}
             </div>
-          ) : (
-            <Card className="text-center py-12">
-              <CalendarDays className="w-16 h-16 text-dark-600 mx-auto mb-4" />
-              <p className="text-dark-400">現在予定されているイベントはありません</p>
-            </Card>
           )}
         </div>
       </section>

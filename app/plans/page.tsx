@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/layout/Navbar'
@@ -8,21 +9,24 @@ import { Button, Card } from '@/components/ui'
 import { 
   Check, ArrowRight, Sparkles, Calendar, 
   Shirt, Droplets, Hand, CreditCard, Shield,
-  Clock, Users, Baby
+  Clock, Users, Baby, Loader2
 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
-const membershipPlans = [
-  { category: '一般フルタイム', price: '11,000', note: '' },
-  { category: '学生フルタイム（中学生以上）', price: '8,800', note: '※学生証必要' },
-  { category: '月4回', price: '8,800', note: '' },
-  { category: '平日午前会員', price: '6,500', note: '' },
-  { category: 'キッズ（小学生以下）', price: '6,500', note: '' },
-  { category: 'ビジター', price: '3,500', note: '※1回' },
-]
+interface Plan {
+  id: string
+  name: string
+  description: string
+  price: number
+  sessionsPerMonth: number
+  category: string
+  features: string[]
+}
 
+// 静的データ（DBに含めない情報）
 const bulkPlans = [
-  { category: '半年一括（現金のみ）', originalPrice: '66,000', price: '60,000' },
-  { category: '年間一括（現金のみ）', originalPrice: '132,000', price: '121,000' },
+  { category: '半年一括（現金のみ）', originalPrice: 66000, price: 60000 },
+  { category: '年間一括（現金のみ）', originalPrice: 132000, price: 121000 },
 ]
 
 const dailyRates = [
@@ -49,6 +53,22 @@ const joinItems = [
 ]
 
 export default function PlansPage() {
+  const [plans, setPlans] = useState<Plan[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/plans?category=membership')
+      .then(res => res.json())
+      .then(data => {
+        setPlans(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Plans fetch error:', err)
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -115,30 +135,55 @@ export default function PlansPage() {
             viewport={{ once: true }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200"
           >
-            <table className="w-full">
-              <thead>
-                <tr className="bg-primary-500 text-white">
-                  <th className="py-4 px-6 text-left font-semibold">会員区分</th>
-                  <th className="py-4 px-6 text-right font-semibold">月額</th>
-                </tr>
-              </thead>
-              <tbody>
-                {membershipPlans.map((plan, index) => (
-                  <tr 
-                    key={index} 
-                    className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
-                  >
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+              </div>
+            ) : plans.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-primary-500 text-white">
+                    <th className="py-4 px-6 text-left font-semibold">会員区分</th>
+                    <th className="py-4 px-6 text-right font-semibold">月額</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plans.map((plan, index) => (
+                    <tr 
+                      key={plan.id} 
+                      className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+                    >
+                      <td className="py-4 px-6">
+                        <span className="text-gray-900 font-medium">{plan.name}</span>
+                        {plan.description && (
+                          <span className="text-sm text-gray-500 ml-2">（{plan.description}）</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <span className="text-2xl font-bold text-gray-900">
+                          {formatCurrency(plan.price)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* ビジターは固定で追加 */}
+                  <tr className="border-b border-gray-100 bg-gray-50">
                     <td className="py-4 px-6">
-                      <span className="text-gray-900 font-medium">{plan.category}</span>
-                      {plan.note && <span className="text-sm text-gray-500 ml-2">{plan.note}</span>}
+                      <span className="text-gray-900 font-medium">ビジター</span>
+                      <span className="text-sm text-gray-500 ml-2">※1回</span>
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <span className="text-2xl font-bold text-gray-900">¥{plan.price}</span>
+                      <span className="text-2xl font-bold text-gray-900">¥3,500</span>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p>現在プランが登録されていません</p>
+                <p className="text-sm mt-2">管理者に連絡してください</p>
+              </div>
+            )}
           </motion.div>
 
           {/* 一括払いプラン */}
@@ -157,8 +202,12 @@ export default function PlansPage() {
                 <div key={index} className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm">
                   <span className="text-gray-900 font-medium">{plan.category}</span>
                   <div className="text-right">
-                    <span className="text-gray-400 line-through text-lg mr-3">¥{plan.originalPrice}</span>
-                    <span className="text-2xl font-bold text-primary-600">¥{plan.price}</span>
+                    <span className="text-gray-400 line-through text-lg mr-3">
+                      {formatCurrency(plan.originalPrice)}
+                    </span>
+                    <span className="text-2xl font-bold text-primary-600">
+                      {formatCurrency(plan.price)}
+                    </span>
                   </div>
                 </div>
               ))}
