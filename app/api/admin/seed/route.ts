@@ -10,6 +10,7 @@ const membershipPlans = [
     description: '全ての時間帯で利用可能な一般会員向けプラン',
     price: 11000,
     sessionsPerMonth: 0, // 無制限
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'membership',
       items: ['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能']
@@ -22,6 +23,7 @@ const membershipPlans = [
     description: '中学生以上の学生向けプラン（学生証必要）',
     price: 8800,
     sessionsPerMonth: 0,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'membership',
       items: ['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能', '学生証必要']
@@ -34,6 +36,7 @@ const membershipPlans = [
     description: '月4回までの利用が可能なプラン',
     price: 8800,
     sessionsPerMonth: 4,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'membership',
       items: ['月4回まで利用可能', '全クラス参加OK']
@@ -46,6 +49,7 @@ const membershipPlans = [
     description: '平日午前中のみ利用可能なお得なプラン',
     price: 6500,
     sessionsPerMonth: 0,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'membership',
       items: ['平日午前のみ利用可能', '午前クラス参加OK']
@@ -58,6 +62,7 @@ const membershipPlans = [
     description: '小学生以下のお子様向けプラン',
     price: 6500,
     sessionsPerMonth: 0,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'membership',
       items: ['キッズクラス参加OK', '小学生以下対象']
@@ -74,6 +79,7 @@ const personal30minPlans = [
     description: '30分パーソナルレッスン 月4回コース',
     price: 16000,
     sessionsPerMonth: 4,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'personal',
       duration: 30,
@@ -88,6 +94,7 @@ const personal30minPlans = [
     description: '30分パーソナルレッスン 月6回コース',
     price: 21000,
     sessionsPerMonth: 6,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'personal',
       duration: 30,
@@ -106,6 +113,7 @@ const personal60minPlans = [
     description: '60分パーソナルレッスン 月4回コース',
     price: 22000,
     sessionsPerMonth: 4,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'personal',
       duration: 60,
@@ -120,6 +128,7 @@ const personal60minPlans = [
     description: '60分パーソナルレッスン 月6回コース',
     price: 30000,
     sessionsPerMonth: 6,
+    durationMonths: 1,
     features: JSON.stringify({
       category: 'personal',
       duration: 60,
