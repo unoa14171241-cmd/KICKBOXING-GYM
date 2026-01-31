@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -31,7 +31,13 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error)
       } else {
-        router.push('/dashboard')
+        // セッションを取得して役割に応じてリダイレクト
+        const session = await getSession()
+        if (session?.user?.role === 'owner' || session?.user?.role === 'trainer') {
+          router.push('/admin')
+        } else {
+          router.push('/dashboard')
+        }
         router.refresh()
       }
     } catch (err) {

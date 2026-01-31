@@ -54,7 +54,11 @@ export default function DashboardPage() {
     if (status === 'unauthenticated') {
       router.push('/login')
     }
-  }, [status, router])
+    // 管理者は/adminにリダイレクト
+    if (session?.user?.role === 'owner' || session?.user?.role === 'trainer') {
+      router.push('/admin')
+    }
+  }, [status, session, router])
 
   useEffect(() => {
     if (session?.user) {
