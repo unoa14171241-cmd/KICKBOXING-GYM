@@ -327,7 +327,7 @@ export default function PlansPage() {
               体験当日の入会で入会金半額キャンペーン実施中
             </p>
             <Link href="/register">
-              <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-50 shadow-xl">
+              <Button size="lg" className="bg-gray-900 text-white hover:bg-gray-800 shadow-xl border-4 border-white font-bold text-lg px-10 py-4">
                 無料体験を予約する
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
