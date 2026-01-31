@@ -79,7 +79,7 @@ export function Navbar() {
                     </Link>
                   )}
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: '/' })}
                     className="flex items-center gap-2 text-gray-300 hover:text-primary-400 transition-colors"
                   >
                     <LogOut className="w-5 h-5" />
@@ -156,7 +156,7 @@ export function Navbar() {
                         </Link>
                       )}
                       <button
-                        onClick={() => signOut()}
+                        onClick={() => signOut({ callbackUrl: '/' })}
                         className="flex items-center gap-2 py-2 text-gray-300 hover:text-primary-400 transition-colors w-full"
                       >
                         <LogOut className="w-5 h-5" />
