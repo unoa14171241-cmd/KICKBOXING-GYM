@@ -13,7 +13,8 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/plans', label: '料金案内' },
-    { href: '/trainers', label: 'パーソナルレッスン' },
+    { href: '/lesson', label: 'パーソナルレッスン' },
+    { href: '/trainers', label: 'トレーナー' },
     { href: '/events', label: 'イベント' },
     { href: '/shop', label: 'ショップ' },
   ]
