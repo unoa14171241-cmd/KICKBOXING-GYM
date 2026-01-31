@@ -6,51 +6,111 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
-  // プランを作成
+  // プランを作成（TRIM GYM料金体系）
   const plans = await Promise.all([
     prisma.plan.upsert({
-      where: { id: 'plan-light' },
-      update: {},
+      where: { id: 'plan-fulltime' },
+      update: {
+        name: '一般フルタイム',
+        description: '全ての時間帯で利用可能な一般会員向けプラン',
+        price: 11000,
+        sessionsPerMonth: 0, // 無制限
+        features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能']),
+      },
       create: {
-        id: 'plan-light',
-        name: 'ライト',
-        description: '週1回ペースでトレーニングしたい方向け',
-        price: 19800,
-        sessionsPerMonth: 4,
+        id: 'plan-fulltime',
+        name: '一般フルタイム',
+        description: '全ての時間帯で利用可能な一般会員向けプラン',
+        price: 11000,
+        sessionsPerMonth: 0, // 無制限
         durationMonths: 1,
-        features: JSON.stringify(['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約']),
+        features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能']),
         isActive: true,
         sortOrder: 1,
       },
     }),
     prisma.plan.upsert({
-      where: { id: 'plan-standard' },
-      update: {},
+      where: { id: 'plan-student' },
+      update: {
+        name: '学生フルタイム',
+        description: '中学生以上の学生向けプラン（学生証必要）',
+        price: 8800,
+        sessionsPerMonth: 0, // 無制限
+        features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能', '学生証必要']),
+      },
       create: {
-        id: 'plan-standard',
-        name: 'スタンダード',
-        description: '週2回ペースでしっかりトレーニングしたい方向け',
-        price: 34800,
-        sessionsPerMonth: 8,
+        id: 'plan-student',
+        name: '学生フルタイム',
+        description: '中学生以上の学生向けプラン（学生証必要）',
+        price: 8800,
+        sessionsPerMonth: 0, // 無制限
         durationMonths: 1,
-        features: JSON.stringify(['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約', 'グローブ貸出無料', 'イベント優先参加']),
+        features: JSON.stringify(['全時間帯利用可能', '全クラス参加OK', 'フリータイム利用可能', '学生証必要']),
         isActive: true,
         sortOrder: 2,
       },
     }),
     prisma.plan.upsert({
-      where: { id: 'plan-premium' },
-      update: {},
+      where: { id: 'plan-monthly4' },
+      update: {
+        name: '月4回',
+        description: '月4回までの利用が可能なプラン',
+        price: 8800,
+        sessionsPerMonth: 4,
+        features: JSON.stringify(['月4回まで利用可能', '全クラス参加OK']),
+      },
       create: {
-        id: 'plan-premium',
-        name: 'プレミアム',
-        description: '本格的にトレーニングしたい方向け',
-        price: 49800,
-        sessionsPerMonth: 0, // 無制限
+        id: 'plan-monthly4',
+        name: '月4回',
+        description: '月4回までの利用が可能なプラン',
+        price: 8800,
+        sessionsPerMonth: 4,
         durationMonths: 1,
-        features: JSON.stringify(['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約', 'グローブ貸出無料', 'イベント優先参加', '栄養指導', 'プロテイン提供']),
+        features: JSON.stringify(['月4回まで利用可能', '全クラス参加OK']),
         isActive: true,
         sortOrder: 3,
+      },
+    }),
+    prisma.plan.upsert({
+      where: { id: 'plan-morning' },
+      update: {
+        name: '平日午前会員',
+        description: '平日午前中のみ利用可能なお得なプラン',
+        price: 6500,
+        sessionsPerMonth: 0, // 無制限
+        features: JSON.stringify(['平日午前のみ利用可能', '午前クラス参加OK']),
+      },
+      create: {
+        id: 'plan-morning',
+        name: '平日午前会員',
+        description: '平日午前中のみ利用可能なお得なプラン',
+        price: 6500,
+        sessionsPerMonth: 0, // 無制限
+        durationMonths: 1,
+        features: JSON.stringify(['平日午前のみ利用可能', '午前クラス参加OK']),
+        isActive: true,
+        sortOrder: 4,
+      },
+    }),
+    prisma.plan.upsert({
+      where: { id: 'plan-kids' },
+      update: {
+        name: 'キッズ',
+        description: '小学生以下のお子様向けプラン',
+        price: 6500,
+        sessionsPerMonth: 0, // 無制限
+        features: JSON.stringify(['キッズクラス参加OK', '小学生以下対象']),
+      },
+      create: {
+        id: 'plan-kids',
+        name: 'キッズ',
+        description: '小学生以下のお子様向けプラン',
+        price: 6500,
+        sessionsPerMonth: 0, // 無制限
+        durationMonths: 1,
+        features: JSON.stringify(['キッズクラス参加OK', '小学生以下対象']),
+        isActive: true,
+        sortOrder: 5,
       },
     }),
   ])
@@ -59,10 +119,10 @@ async function main() {
   // 管理者ユーザーを作成
   const adminPassword = await bcrypt.hash('admin123', 12)
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@blaze-gym.jp' },
+    where: { email: 'admin@trim-gym.jp' },
     update: {},
     create: {
-      email: 'admin@blaze-gym.jp',
+      email: 'admin@trim-gym.jp',
       password: adminPassword,
       role: 'owner',
     },
@@ -73,10 +133,10 @@ async function main() {
   const trainerPassword = await bcrypt.hash('trainer123', 12)
   const trainers = await Promise.all([
     prisma.user.upsert({
-      where: { email: 'yamada@blaze-gym.jp' },
+      where: { email: 'yamada@trim-gym.jp' },
       update: {},
       create: {
-        email: 'yamada@blaze-gym.jp',
+        email: 'yamada@trim-gym.jp',
         password: trainerPassword,
         role: 'trainer',
         trainer: {
@@ -91,10 +151,10 @@ async function main() {
       },
     }),
     prisma.user.upsert({
-      where: { email: 'sato@blaze-gym.jp' },
+      where: { email: 'sato@trim-gym.jp' },
       update: {},
       create: {
-        email: 'sato@blaze-gym.jp',
+        email: 'sato@trim-gym.jp',
         password: trainerPassword,
         role: 'trainer',
         trainer: {
@@ -109,10 +169,10 @@ async function main() {
       },
     }),
     prisma.user.upsert({
-      where: { email: 'tanaka@blaze-gym.jp' },
+      where: { email: 'tanaka@trim-gym.jp' },
       update: {},
       create: {
-        email: 'tanaka@blaze-gym.jp',
+        email: 'tanaka@trim-gym.jp',
         password: trainerPassword,
         role: 'trainer',
         trainer: {
@@ -136,7 +196,7 @@ async function main() {
       update: {},
       create: {
         id: 'product-gloves-1',
-        name: 'BLAZEオリジナルグローブ 14oz',
+        name: 'TRIMオリジナルグローブ 14oz',
         description: 'トレーニング用高品質ボクシンググローブ。手首のサポート力が高く、長時間の使用でも快適です。',
         price: 12800,
         category: 'gloves',
@@ -149,7 +209,7 @@ async function main() {
       update: {},
       create: {
         id: 'product-gloves-2',
-        name: 'BLAZEオリジナルグローブ 16oz',
+        name: 'TRIMオリジナルグローブ 16oz',
         description: 'スパーリング用ボクシンググローブ。クッション性が高く安全にトレーニングできます。',
         price: 14800,
         category: 'gloves',
@@ -171,12 +231,25 @@ async function main() {
       },
     }),
     prisma.product.upsert({
+      where: { id: 'product-glove-military' },
+      update: {},
+      create: {
+        id: 'product-glove-military',
+        name: '軍手',
+        description: 'レンタルグローブ使用時に必要な軍手です。',
+        price: 100,
+        category: 'accessories',
+        stock: 100,
+        isActive: true,
+      },
+    }),
+    prisma.product.upsert({
       where: { id: 'product-apparel-1' },
       update: {},
       create: {
         id: 'product-apparel-1',
-        name: 'BLAZEドライTシャツ',
-        description: '吸汗速乾素材のトレーニングTシャツ。BLAZEロゴ入り。',
+        name: 'TRIMドライTシャツ',
+        description: '吸汗速乾素材のトレーニングTシャツ。TRIMロゴ入り。',
         price: 4500,
         category: 'apparel',
         stock: 30,
@@ -214,7 +287,7 @@ async function main() {
         date: nextMonth,
         startTime: '14:00',
         endTime: '16:00',
-        location: 'BLAZE GYM メインスタジオ',
+        location: 'TRIM GYM メインスタジオ',
         capacity: 20,
         price: 0,
         eventType: 'seminar',
@@ -231,7 +304,7 @@ async function main() {
         date: new Date(nextMonth.getTime() + 14 * 24 * 60 * 60 * 1000),
         startTime: '10:00',
         endTime: '17:00',
-        location: 'BLAZE GYM メインスタジオ',
+        location: 'TRIM GYM メインスタジオ',
         capacity: 30,
         price: 3000,
         eventType: 'competition',
@@ -248,7 +321,7 @@ async function main() {
         date: new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000),
         startTime: '19:00',
         endTime: '21:00',
-        location: 'BLAZE GYM メインスタジオ',
+        location: 'TRIM GYM メインスタジオ',
         capacity: 15,
         price: 2000,
         eventType: 'workshop',
@@ -274,11 +347,11 @@ async function main() {
           firstNameKana: 'タロウ',
           lastNameKana: 'テスト',
           phone: '090-1234-5678',
-          memberNumber: 'BKG-DEMO-0001',
+          memberNumber: 'TRM-DEMO-0001',
           qrCode: 'DEMO1234567890AB',
-          planId: 'plan-standard',
+          planId: 'plan-fulltime',
           status: 'active',
-          remainingSessions: 6,
+          remainingSessions: 0, // 無制限プランなので0
         },
       },
     },
@@ -289,8 +362,8 @@ async function main() {
   console.log('🎉 Database seeded successfully!')
   console.log('')
   console.log('📋 Test Accounts:')
-  console.log('   Admin: admin@blaze-gym.jp / admin123')
-  console.log('   Trainer: yamada@blaze-gym.jp / trainer123')
+  console.log('   Admin: admin@trim-gym.jp / admin123')
+  console.log('   Trainer: yamada@trim-gym.jp / trainer123')
   console.log('   Member: demo@example.com / member123')
 }
 
