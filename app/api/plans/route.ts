@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+interface ParsedFeatures {
+  category?: string
+  items?: string[]
+  duration?: number
+  type?: string
+  validity?: string
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -16,7 +24,7 @@ export async function GET(request: Request) {
       if (!category || category === 'all') return true
       
       try {
-        const features = JSON.parse(plan.features || '{}')
+        const features: ParsedFeatures = JSON.parse(plan.features || '{}')
         return features.category === category
       } catch {
         return false
@@ -25,7 +33,7 @@ export async function GET(request: Request) {
 
     // フロントエンド用にフォーマット
     const formattedPlans = filteredPlans.map(plan => {
-      let parsedFeatures = { category: 'membership', items: [] as string[] }
+      let parsedFeatures: ParsedFeatures = { category: 'membership', items: [] }
       try {
         parsedFeatures = JSON.parse(plan.features || '{}')
       } catch {}
