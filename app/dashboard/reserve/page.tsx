@@ -128,17 +128,17 @@ export default function ReservePage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
                   step >= s.num
-                    ? 'bg-gradient-to-r from-primary-500 to-accent-orange text-white'
-                    : 'bg-dark-700 text-dark-400'
+                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white'
+                    : 'bg-gray-200 text-gray-400'
                 }`}
               >
                 {step > s.num ? <Check className="w-5 h-5" /> : s.num}
               </div>
-              <span className={`ml-2 text-sm ${step >= s.num ? 'text-white' : 'text-dark-400'}`}>
+              <span className={`ml-2 text-sm ${step >= s.num ? 'text-gray-900' : 'text-gray-400'}`}>
                 {s.label}
               </span>
               {index < 2 && (
-                <div className={`w-16 h-1 mx-4 rounded ${step > s.num ? 'bg-primary-500' : 'bg-dark-700'}`} />
+                <div className={`w-16 h-1 mx-4 rounded ${step > s.num ? 'bg-primary-500' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -151,7 +151,7 @@ export default function ReservePage() {
             animate={{ opacity: 1, x: 0 }}
           >
             <Card>
-              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <User className="w-6 h-6 text-primary-500" />
                 トレーナーを選択
               </h2>
@@ -164,19 +164,19 @@ export default function ReservePage() {
                       onClick={() => setSelectedTrainer(trainer)}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         selectedTrainer?.id === trainer.id
-                          ? 'border-primary-500 bg-primary-500/10'
-                          : 'border-dark-600 hover:border-dark-500'
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-dark-700 flex items-center justify-center">
-                          <User className="w-8 h-8 text-dark-400" />
+                        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                          <User className="w-8 h-8 text-gray-400" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-white">
+                          <h3 className="font-semibold text-gray-900">
                             {trainer.lastName} {trainer.firstName}
                           </h3>
-                          <p className="text-sm text-dark-400">
+                          <p className="text-sm text-gray-500">
                             {trainer.specialization || 'キックボクシング'}
                           </p>
                         </div>
@@ -184,7 +184,7 @@ export default function ReservePage() {
                     </button>
                   ))
                 ) : (
-                  <div className="col-span-2 text-center py-8 text-dark-400">
+                  <div className="col-span-2 text-center py-8 text-gray-500">
                     <p>トレーナーを読み込み中...</p>
                   </div>
                 )}
@@ -209,7 +209,7 @@ export default function ReservePage() {
             animate={{ opacity: 1, x: 0 }}
           >
             <Card>
-              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Calendar className="w-6 h-6 text-primary-500" />
                 日時を選択
               </h2>
@@ -220,55 +220,67 @@ export default function ReservePage() {
                   <div className="flex items-center justify-between mb-4">
                     <button
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                      className="p-2 rounded-lg hover:bg-dark-700 transition-colors"
+                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
-                      <ChevronLeft className="w-5 h-5 text-dark-400" />
+                      <ChevronLeft className="w-5 h-5 text-gray-600" />
                     </button>
-                    <span className="text-white font-semibold">
+                    <span className="text-gray-900 font-semibold">
                       {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
                     </span>
                     <button
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                      className="p-2 rounded-lg hover:bg-dark-700 transition-colors"
+                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
-                      <ChevronRight className="w-5 h-5 text-dark-400" />
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
 
                   <div className="grid grid-cols-7 gap-1 mb-2">
-                    {['日', '月', '火', '水', '木', '金', '土'].map((day) => (
-                      <div key={day} className="text-center text-dark-400 text-sm py-2">
+                    {['日', '月', '火', '水', '木', '金', '土'].map((day, index) => (
+                      <div 
+                        key={day} 
+                        className={`text-center text-sm py-2 font-medium ${
+                          index === 0 ? 'text-red-500' : index === 6 ? 'text-blue-500' : 'text-gray-500'
+                        }`}
+                      >
                         {day}
                       </div>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-7 gap-1">
-                    {getDaysInMonth(currentMonth).map((date, index) => (
-                      <button
-                        key={index}
-                        onClick={() => date && isDateSelectable(date) && setSelectedDate(date)}
-                        disabled={!date || !isDateSelectable(date)}
-                        className={`
-                          aspect-square rounded-lg text-sm transition-all
-                          ${!date ? 'invisible' : ''}
-                          ${date && isDateSelectable(date)
-                            ? selectedDate?.toDateString() === date.toDateString()
-                              ? 'bg-primary-500 text-white'
-                              : 'hover:bg-dark-700 text-white'
-                            : 'text-dark-600 cursor-not-allowed'
-                          }
-                        `}
-                      >
-                        {date?.getDate()}
-                      </button>
-                    ))}
+                    {getDaysInMonth(currentMonth).map((date, index) => {
+                      const dayOfWeek = date?.getDay()
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => date && isDateSelectable(date) && setSelectedDate(date)}
+                          disabled={!date || !isDateSelectable(date)}
+                          className={`
+                            aspect-square rounded-lg text-sm font-medium transition-all
+                            ${!date ? 'invisible' : ''}
+                            ${date && isDateSelectable(date)
+                              ? selectedDate?.toDateString() === date.toDateString()
+                                ? 'bg-primary-500 text-white'
+                                : dayOfWeek === 0
+                                  ? 'text-red-500 hover:bg-red-50'
+                                  : dayOfWeek === 6
+                                    ? 'text-blue-500 hover:bg-blue-50'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                              : 'text-gray-300 cursor-not-allowed'
+                            }
+                          `}
+                        >
+                          {date?.getDate()}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
 
                 {/* Time Slots */}
                 <div>
-                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <h3 className="text-gray-900 font-semibold mb-4 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-primary-500" />
                     時間を選択
                   </h3>
@@ -284,8 +296,8 @@ export default function ReservePage() {
                           ${slot.available
                             ? selectedTime === slot.time
                               ? 'bg-primary-500 text-white'
-                              : 'bg-dark-700 text-white hover:bg-dark-600'
-                            : 'bg-dark-800 text-dark-600 cursor-not-allowed'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                           }
                         `}
                       >
@@ -318,34 +330,34 @@ export default function ReservePage() {
             animate={{ opacity: 1, x: 0 }}
           >
             <Card>
-              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Check className="w-6 h-6 text-primary-500" />
                 予約内容の確認
               </h2>
 
               <div className="space-y-4 mb-8">
-                <div className="flex justify-between items-center p-4 rounded-xl bg-dark-800/50">
-                  <span className="text-dark-400">トレーナー</span>
-                  <span className="text-white font-medium">
+                <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50">
+                  <span className="text-gray-500">トレーナー</span>
+                  <span className="text-gray-900 font-medium">
                     {selectedTrainer?.lastName} {selectedTrainer?.firstName}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-4 rounded-xl bg-dark-800/50">
-                  <span className="text-dark-400">日付</span>
-                  <span className="text-white font-medium">
+                <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50">
+                  <span className="text-gray-500">日付</span>
+                  <span className="text-gray-900 font-medium">
                     {selectedDate && formatDate(selectedDate)}（{getDayOfWeekLabel(selectedDate?.getDay() || 0)}）
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-4 rounded-xl bg-dark-800/50">
-                  <span className="text-dark-400">時間</span>
-                  <span className="text-white font-medium">
+                <div className="flex justify-between items-center p-4 rounded-xl bg-gray-50">
+                  <span className="text-gray-500">時間</span>
+                  <span className="text-gray-900 font-medium">
                     {selectedTime} - {parseInt(selectedTime?.split(':')[0] || '0') + 1}:00
                   </span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/30 mb-6">
-                <p className="text-sm text-primary-400">
+              <div className="p-4 rounded-xl bg-primary-50 border border-primary-200 mb-6">
+                <p className="text-sm text-primary-700">
                   予約後のキャンセルは予約日の24時間前まで可能です。<br />
                   振替は同月内で1回まで可能です。
                 </p>
