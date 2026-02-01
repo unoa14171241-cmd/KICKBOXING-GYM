@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Calendar, QrCode, ShoppingBag, 
   CalendarDays, User, Settings, LogOut, Menu, X,
-  Flame, Bell
+  Flame, Bell, CreditCard
 } from 'lucide-react'
 
 interface DashboardLayoutProps {
@@ -17,6 +17,7 @@ interface DashboardLayoutProps {
 
 const memberNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'ダッシュボード' },
+  { href: '/dashboard/plans', icon: CreditCard, label: 'プラン' },
   { href: '/dashboard/reserve', icon: Calendar, label: '予約' },
   { href: '/dashboard/reservations', icon: CalendarDays, label: '予約履歴' },
   { href: '/dashboard/member-card', icon: QrCode, label: '会員証' },
