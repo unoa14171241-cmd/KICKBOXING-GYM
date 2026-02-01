@@ -1,320 +1,158 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Button, Input, Card } from '@/components/ui'
 import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { Button, Card } from '@/components/ui'
-import { 
-  Flame, Target, Users, Trophy, Calendar, 
-  ShoppingBag, QrCode, Shield, ArrowRight,
-  Zap, Heart, Clock, MapPin
-} from 'lucide-react'
-
-const features = [
-  {
-    icon: Target,
-    title: 'パーソナルトレーニング',
-    description: '一人ひとりの目標に合わせた完全オーダーメイドのトレーニングプログラム',
-  },
-  {
-    icon: Users,
-    title: 'プロトレーナー',
-    description: '現役・元プロ選手による本格的な指導で確実にスキルアップ',
-  },
-  {
-    icon: Clock,
-    title: '柔軟な予約システム',
-    description: 'オンラインで24時間いつでも予約・振替が可能',
-  },
-  {
-    icon: Shield,
-    title: '初心者歓迎',
-    description: '未経験者でも安心。基礎から丁寧に指導します',
-  },
-]
-
-const stats = [
-  { value: '500+', label: '会員数' },
-  { value: '10+', label: 'トレーナー' },
-  { value: '98%', label: '満足度' },
-  { value: '5年+', label: '運営実績' },
-]
-
-const plans = [
-  {
-    name: 'ライト',
-    price: '19,800',
-    sessions: '月4回',
-    features: ['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約'],
-    popular: false,
-  },
-  {
-    name: 'スタンダード',
-    price: '34,800',
-    sessions: '月8回',
-    features: ['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約', 'グローブ貸出無料', 'イベント優先参加'],
-    popular: true,
-  },
-  {
-    name: 'プレミアム',
-    price: '49,800',
-    sessions: '無制限',
-    features: ['パーソナルトレーニング', '更衣室・シャワー利用', 'オンライン予約', 'グローブ貸出無料', 'イベント優先参加', '栄養指導', 'プロテイン提供'],
-    popular: false,
-  },
-]
+import { Mail, Lock, ArrowRight, Flame, Loader2 } from 'lucide-react'
 
 export default function HomePage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  // ログイン済みの場合は適切なページにリダイレクト
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      if (session.user.role === 'owner' || session.user.role === 'trainer') {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
+    }
+  }, [status, session, router])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        // セッションが更新されるとuseEffectでリダイレクトされる
+        router.refresh()
+      }
+    } catch (err) {
+      setError('ログイン中にエラーが発生しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ローディング中
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
+
+  // ログイン済みの場合（リダイレクト待ち）
+  if (status === 'authenticated') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mx-auto mb-4" />
+          <p className="text-gray-600">リダイレクト中...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-white">
       <Navbar />
-
-      {/* Hero Section - 明るいテーマ */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-primary-50 to-white pt-28">
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-300/20 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 border border-primary-200 text-primary-600 text-sm font-medium mb-6">
-                <Flame className="w-4 h-4" />
-                茨城県つくばで人気No.1
-              </span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
-              style={{ fontFamily: 'var(--font-bebas)', letterSpacing: '0.05em' }}
-            >
-              KICKBOXING
-              <span className="block bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 bg-clip-text text-transparent">
-                TRIM GYM
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-gray-600 max-w-2xl mx-auto mb-10"
-            >
-              プロのトレーナーによる完全マンツーマン指導。<br />
-              初心者からプロ志望まで、あなたの目標達成をサポートします。
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <Link href="/register">
-                <Button size="lg" className="group">
-                  無料体験を予約する
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/plans">
-                <Button variant="secondary" size="lg">
-                  料金プランを見る
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary-600 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
-                  {stat.value}
-                </div>
-                <div className="text-gray-500">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
+      
+      <div className="flex items-center justify-center min-h-screen px-4 pt-28">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
         >
-          <div className="w-6 h-10 rounded-full border-2 border-primary-300 flex items-start justify-center p-2">
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-primary-500"
-            />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 relative bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
-              WHY CHOOSE TRIM GYM?
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
-              TRIM GYMが選ばれる理由
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card hoverable className="h-full text-center">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary-100 flex items-center justify-center">
-                    <feature.icon className="w-7 h-7 text-primary-500" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-500 text-sm">{feature.description}</p>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Shop Banner - TRIM GYM風 */}
-      <section className="py-16 bg-primary-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
-                TRIM GYM つくば
-              </h2>
-              <p className="text-white/90 flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                茨城県つくば市○○ 1-2-3
-              </p>
+          <Card className="p-8 shadow-xl">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-500 flex items-center justify-center">
+                <Flame className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-bebas)' }}>
+                WELCOME BACK
+              </h1>
+              <p className="text-gray-500">アカウントにログイン</p>
             </div>
-            <Link href="/register">
-              <Button variant="secondary" size="lg" className="bg-white text-primary-600 hover:bg-gray-50">
-                無料体験予約
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
-      {/* Plans Section */}
-      <section className="py-24 relative bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-bebas)' }}>
-              MEMBERSHIP PLANS
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
-              あなたに最適なプランをお選びください
-            </p>
-          </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card 
-                  variant={plan.popular ? 'pink' : 'default'} 
-                  className={`h-full relative ${plan.popular ? 'scale-105 shadow-xl' : ''}`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="px-4 py-1 rounded-full bg-white text-primary-500 text-sm font-semibold shadow-lg">
-                        人気No.1
-                      </span>
-                    </div>
-                  )}
-                  <div className="text-center mb-6">
-                    <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className={`text-4xl font-bold ${plan.popular ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'var(--font-bebas)' }}>
-                        ¥{plan.price}
-                      </span>
-                      <span className={plan.popular ? 'text-white/80' : 'text-gray-500'}>/月</span>
-                    </div>
-                    <p className={`mt-2 ${plan.popular ? 'text-white/90' : 'text-primary-500'}`}>{plan.sessions}</p>
-                  </div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className={`flex items-center gap-3 ${plan.popular ? 'text-white/90' : 'text-gray-600'}`}>
-                        <Zap className={`w-4 h-4 ${plan.popular ? 'text-white' : 'text-primary-500'}`} />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/register" className="block">
-                    <Button 
-                      variant={plan.popular ? 'secondary' : 'primary'} 
-                      className={`w-full ${plan.popular ? 'bg-white text-primary-600 hover:bg-gray-50' : ''}`}
-                    >
-                      このプランで始める
-                    </Button>
-                  </Link>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Input
+                  type="email"
+                  placeholder="メールアドレス"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-12"
+                  required
+                />
+              </div>
 
-      {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-bebas)' }}>
-              START YOUR JOURNEY TODAY
-            </h2>
-            <p className="text-xl text-white/90 mb-8">
-              まずは無料体験から。あなたの変化がここから始まります。
-            </p>
-            <Link href="/register">
-              <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-50 shadow-xl">
-                無料体験を予約する
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Input
+                  type="password"
+                  placeholder="パスワード"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-12"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 text-gray-600">
+                  <input type="checkbox" className="rounded border-gray-300 bg-white text-primary-500" />
+                  ログイン状態を保持
+                </label>
+                <Link href="/forgot-password" className="text-primary-500 hover:text-primary-600">
+                  パスワードを忘れた方
+                </Link>
+              </div>
+
+              <Button type="submit" className="w-full" isLoading={isLoading}>
+                ログイン
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+            </form>
 
-      <Footer />
+            <div className="mt-8 text-center">
+              <p className="text-gray-500">
+                アカウントをお持ちでない方は{' '}
+                <Link href="/register" className="text-primary-500 hover:text-primary-600 font-medium">
+                  新規登録
+                </Link>
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   )
 }
