@@ -213,7 +213,7 @@ export default function PlansPage() {
                 >
                   {isCurrentPlan && (
                     <div className="absolute -top-3 left-4">
-                      <Badge variant="primary">現在のプラン</Badge>
+                      <Badge variant="info">現在のプラン</Badge>
                     </div>
                   )}
                   
