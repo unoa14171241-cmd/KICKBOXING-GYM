@@ -54,8 +54,8 @@ export default function DashboardPage() {
     if (status === 'unauthenticated') {
       router.push('/login')
     }
-    // 管理者は/adminにリダイレクト
-    if (session?.user?.role === 'owner' || session?.user?.role === 'trainer') {
+    // 管理者系ロールは/adminにリダイレクト
+    if (session?.user?.role && ['owner', 'store_manager', 'staff', 'trainer'].includes(session.user.role)) {
       router.push('/admin')
     }
   }, [status, session, router])

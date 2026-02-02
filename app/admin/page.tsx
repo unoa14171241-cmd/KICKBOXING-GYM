@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { Card, Badge } from '@/components/ui'
@@ -32,14 +33,18 @@ interface StoreInfo {
 }
 
 export default function AdminDashboardPage() {
+  const { data: session } = useSession()
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
   const [stores, setStores] = useState<StoreInfo[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [redirecting, setRedirecting] = useState(false)
 
   useEffect(() => {
-    fetchStats()
-  }, [])
+    if (session) {
+      fetchStats()
+    }
+  }, [session])
 
   const fetchStats = async () => {
     try {
@@ -47,6 +52,18 @@ export default function AdminDashboardPage() {
       const data = await res.json()
       setStats(data.stats)
       setStores(data.stores || [])
+      
+      // 店舗マネージャー/スタッフで、所属店舗が1つの場合は自動的に店舗ダッシュボードへ
+      if (
+        session?.user?.role &&
+        ['store_manager', 'staff'].includes(session.user.role) &&
+        data.stores?.length === 1 &&
+        !redirecting
+      ) {
+        setRedirecting(true)
+        router.push(`/admin/stores/${data.stores[0].id}/dashboard`)
+        return
+      }
     } catch (error) {
       console.error(error)
       // デモ用のダミーデータ

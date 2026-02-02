@@ -20,9 +20,11 @@ export default function HomePage() {
   // ログイン済みの場合は適切なページにリダイレクト
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
-      if (session.user.role === 'owner' || session.user.role === 'trainer') {
+      // 管理者系ロール（owner, store_manager, staff, trainer）は管理画面へ
+      if (['owner', 'store_manager', 'staff', 'trainer'].includes(session.user.role)) {
         router.push('/admin')
       } else {
+        // 会員は会員ダッシュボードへ
         router.push('/dashboard')
       }
     }
