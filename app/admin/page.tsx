@@ -96,10 +96,10 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-4 md:space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
+          <h1 className="text-xl md:text-3xl font-bold text-dark-900" style={{ fontFamily: 'var(--font-bebas)' }}>
             DASHBOARD
           </h1>
           <p className="text-dark-400">管理ダッシュボード</p>
@@ -107,13 +107,13 @@ export default function AdminDashboardPage() {
 
         {/* Stats Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-32 rounded-2xl bg-dark-800/50 animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             {statCards.map((stat, index) => (
               <motion.div
                 key={stat.title}
@@ -121,7 +121,7 @@ export default function AdminDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="relative overflow-hidden">
+                <Card className="relative overflow-hidden p-3 md:p-4">
                   <div className={`absolute top-0 right-0 w-32 h-32 ${stat.bgColor} rounded-full -mr-10 -mt-10 opacity-50`} />
                   <div className="relative flex items-center gap-4">
                     <div className={`p-3 rounded-xl ${stat.bgColor}`}>
@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div>
                       <p className="text-dark-400 text-sm">{stat.title}</p>
-                      <p className="text-2xl font-bold text-dark-900">
+                      <p className="text-base md:text-2xl font-bold text-dark-900">
                         {stat.isText ? stat.value : stat.value.toLocaleString()}
                       </p>
                     </div>
@@ -141,10 +141,10 @@ export default function AdminDashboardPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <h2 className="text-lg font-semibold text-dark-900 mb-4">クイックアクション</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
               <a
                 href="/admin/members/new"
                 className="p-4 rounded-xl bg-dark-800/50 hover:bg-dark-700 transition-colors text-center"
