@@ -97,14 +97,14 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-4 md:space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
+            <h1 className="text-xl md:text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-bebas)' }}>
               WELCOME, {member.lastName} {member.firstName}
             </h1>
-            <p className="text-dark-400">会員番号: {member.memberNumber}</p>
+            <p className="text-dark-400 text-sm md:text-base">会員番号: {member.memberNumber}</p>
           </div>
           <Link href="/dashboard/reserve">
             <Button>
@@ -115,13 +115,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden p-3 md:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full -mr-10 -mt-10" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
@@ -130,7 +130,7 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-dark-400 text-sm">現在のプラン</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{member.plan?.name || '未設定'}</p>
+                <p className="text-base md:text-2xl font-bold text-white truncate">{member.plan?.name || '未設定'}</p>
                 {member.plan && (
                   <p className="text-dark-400 text-sm">{formatCurrency(member.plan.price)}/月</p>
                 )}
@@ -143,7 +143,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden p-3 md:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent-orange/10 rounded-full -mr-10 -mt-10" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-dark-400 text-sm">残りセッション</span>
                 </div>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-base md:text-2xl font-bold text-white">
                   {member.plan?.sessionsPerMonth === 0 ? '無制限' : `${member.remainingSessions}回`}
                 </p>
                 {member.plan && member.plan.sessionsPerMonth > 0 && (
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden p-3 md:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -mr-10 -mt-10" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="relative overflow-hidden">
+            <Card className="relative overflow-hidden p-3 md:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
@@ -195,8 +195,8 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-dark-400 text-sm">予約件数</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{member.reservations.length}件</p>
-                <p className="text-dark-400 text-sm">今後の予約</p>
+                <p className="text-base md:text-2xl font-bold text-white">{member.reservations.length}件</p>
+                <p className="text-dark-400 text-xs md:text-sm">今後の予約</p>
               </div>
             </Card>
           </motion.div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
               <div className="qr-container mx-auto mb-4">
                 <QRCodeSVG
                   value={member.qrCode}
-                  size={180}
+                  size={140}
                   level="H"
                   includeMargin={false}
                 />
