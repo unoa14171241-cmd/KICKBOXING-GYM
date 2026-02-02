@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import AdminLayout from '@/components/layout/AdminLayout';
+import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card, Button, Input, Modal, Badge } from '@/components/ui';
 import { motion } from 'framer-motion';
 
