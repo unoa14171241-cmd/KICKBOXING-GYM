@@ -2,6 +2,30 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
+// TRIM GYMの店舗データ
+const stores = [
+  {
+    id: 'store-tsukuba',
+    name: 'TRIMGYM つくば',
+    code: 'tsukuba',
+    address: '茨城県つくば市竹園2-11-15 柏ファミリープラザテナント１号',
+    postalCode: '305-0032',
+    phone: '',
+    email: 'tsukuba@trim-gym.jp',
+    isActive: true,
+  },
+  {
+    id: 'store-moriya',
+    name: 'TRIMGYM 守谷',
+    code: 'moriya',
+    address: '茨城県つくばみらい市絹の台3-26-4',
+    postalCode: '300-2436',
+    phone: '',
+    email: 'moriya@trim-gym.jp',
+    isActive: true,
+  },
+]
+
 // TRIM GYMの通常会員プラン
 const membershipPlans = [
   {
@@ -302,9 +326,36 @@ export async function POST(request: Request) {
       )
     )
 
+    // 店舗を作成
+    const createdStores = await Promise.all(
+      stores.map(store =>
+        prisma.store.upsert({
+          where: { id: store.id },
+          update: {
+            name: store.name,
+            address: store.address,
+            postalCode: store.postalCode,
+            phone: store.phone,
+            email: store.email,
+            isActive: store.isActive,
+          },
+          create: {
+            id: store.id,
+            name: store.name,
+            code: store.code,
+            address: store.address,
+            postalCode: store.postalCode,
+            phone: store.phone,
+            email: store.email,
+            isActive: store.isActive,
+          },
+        })
+      )
+    )
+
     // 管理者ユーザーを作成
     const hashedPassword = await bcrypt.hash('admin123', 12)
-    await prisma.user.upsert({
+    const adminUser = await prisma.user.upsert({
       where: { email: 'admin@trim-gym.jp' },
       update: {},
       create: {
@@ -314,13 +365,13 @@ export async function POST(request: Request) {
       },
     })
 
-    // トレーナーを作成
+    // トレーナーを作成（店舗に紐付け）
     const trainerPassword = await bcrypt.hash('trainer123', 12)
     
     const trainers = [
-      { email: 'yamada@trim-gym.jp', firstName: '太郎', lastName: '山田', specialization: 'キックボクシング・ボクシング', bio: '元プロキックボクサー。10年以上の指導経験があります。' },
-      { email: 'sato@trim-gym.jp', firstName: '花子', lastName: '佐藤', specialization: 'フィットネスキックボクシング', bio: '女性専門トレーナー。ダイエットやボディメイクを得意としています。' },
-      { email: 'tanaka@trim-gym.jp', firstName: '健太', lastName: '田中', specialization: 'ムエタイ・総合格闘技', bio: 'ムエタイの本場タイで修行経験あり。' },
+      { email: 'yamada@trim-gym.jp', firstName: '太郎', lastName: '山田', specialization: 'キックボクシング・ボクシング', bio: '元プロキックボクサー。10年以上の指導経験があります。', storeId: 'store-tsukuba' },
+      { email: 'sato@trim-gym.jp', firstName: '花子', lastName: '佐藤', specialization: 'フィットネスキックボクシング', bio: '女性専門トレーナー。ダイエットやボディメイクを得意としています。', storeId: 'store-tsukuba' },
+      { email: 'tanaka@trim-gym.jp', firstName: '健太', lastName: '田中', specialization: 'ムエタイ・総合格闘技', bio: 'ムエタイの本場タイで修行経験あり。', storeId: 'store-moriya' },
     ]
 
     for (const t of trainers) {
@@ -341,6 +392,7 @@ export async function POST(request: Request) {
           lastName: t.lastName,
           specialization: t.specialization,
           bio: t.bio,
+          storeId: t.storeId,
         },
         create: {
           userId: trainerUser.id,
@@ -348,10 +400,46 @@ export async function POST(request: Request) {
           lastName: t.lastName,
           specialization: t.specialization,
           bio: t.bio,
+          storeId: t.storeId,
           isActive: true,
         },
       })
     }
+
+    // 店舗スタッフ（店舗管理者）を作成
+    const storeManagerPassword = await bcrypt.hash('manager123', 12)
+    
+    // つくば店の店舗管理者
+    const tsukubaManager = await prisma.user.upsert({
+      where: { email: 'manager-tsukuba@trim-gym.jp' },
+      update: {},
+      create: {
+        email: 'manager-tsukuba@trim-gym.jp',
+        password: storeManagerPassword,
+        role: 'store_manager',
+      },
+    })
+    await prisma.storeStaff.upsert({
+      where: { userId_storeId: { userId: tsukubaManager.id, storeId: 'store-tsukuba' } },
+      update: { role: 'manager', isActive: true },
+      create: { userId: tsukubaManager.id, storeId: 'store-tsukuba', role: 'manager', isActive: true },
+    })
+
+    // 守谷店の店舗管理者
+    const moriyaManager = await prisma.user.upsert({
+      where: { email: 'manager-moriya@trim-gym.jp' },
+      update: {},
+      create: {
+        email: 'manager-moriya@trim-gym.jp',
+        password: storeManagerPassword,
+        role: 'store_manager',
+      },
+    })
+    await prisma.storeStaff.upsert({
+      where: { userId_storeId: { userId: moriyaManager.id, storeId: 'store-moriya' } },
+      update: { role: 'manager', isActive: true },
+      create: { userId: moriyaManager.id, storeId: 'store-moriya', role: 'manager', isActive: true },
+    })
 
     // サンプル商品を作成
     const products = [
@@ -374,12 +462,14 @@ export async function POST(request: Request) {
       success: true,
       message: 'TRIM GYMデータの投入が完了しました',
       data: {
+        stores: stores.length,
         plans: plans.length,
         membershipPlans: membershipPlans.length,
         personalPlans: personal30minPlans.length + personal60minPlans.length,
         ticketPlans: ticket30minPlans.length + ticket60minPlans.length,
         trainers: trainers.length,
         products: products.length,
+        storeManagers: 2,
       },
     })
   } catch (error) {
@@ -394,16 +484,38 @@ export async function POST(request: Request) {
 // GETでステータス確認 & プランがない場合は自動シード
 export async function GET() {
   try {
-    const [plansCount, trainersCount, productsCount, eventsCount, usersCount] = await Promise.all([
+    const [plansCount, trainersCount, productsCount, eventsCount, usersCount, storesCount] = await Promise.all([
       prisma.plan.count(),
       prisma.trainer.count(),
       prisma.product.count(),
       prisma.event.count(),
       prisma.user.count(),
+      prisma.store.count(),
     ])
 
     // プランがない場合は自動でシード
     if (plansCount === 0) {
+      // 店舗を作成
+      await Promise.all(
+        stores.map(store =>
+          prisma.store.upsert({
+            where: { id: store.id },
+            update: {},
+            create: {
+              id: store.id,
+              name: store.name,
+              code: store.code,
+              address: store.address,
+              postalCode: store.postalCode,
+              phone: store.phone,
+              email: store.email,
+              isActive: store.isActive,
+            },
+          })
+        )
+      )
+
+      // プランを作成
       await Promise.all(
         allPlans.map(plan => 
           prisma.plan.upsert({
@@ -439,6 +551,7 @@ export async function GET() {
         initialized: true,
         message: '初期データを自動投入しました',
         counts: {
+          stores: stores.length,
           plans: allPlans.length,
           trainers: 0,
           products: 0,
@@ -480,6 +593,7 @@ export async function GET() {
     return NextResponse.json({
       initialized: plansCount > 0,
       counts: {
+        stores: storesCount,
         plans: plansCount,
         trainers: trainersCount,
         products: productsCount,

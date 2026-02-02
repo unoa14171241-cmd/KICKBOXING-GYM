@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Card } from '@/components/ui'
+import { useRouter } from 'next/navigation'
+import { Card, Badge } from '@/components/ui'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { 
   Users, Calendar, TrendingUp, DollarSign, 
-  UserPlus, CheckCircle, Clock, ShoppingBag
+  UserPlus, CheckCircle, Clock, ShoppingBag, Building2
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
@@ -17,10 +18,23 @@ interface Stats {
   todayCheckIns: number
   monthlyRevenue: number
   newMembersThisMonth: number
+  totalStores: number
+}
+
+interface StoreInfo {
+  id: string
+  name: string
+  code: string
+  _count: {
+    members: number
+    trainers: number
+  }
 }
 
 export default function AdminDashboardPage() {
+  const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
+  const [stores, setStores] = useState<StoreInfo[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -32,6 +46,7 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/stats')
       const data = await res.json()
       setStats(data.stats)
+      setStores(data.stores || [])
     } catch (error) {
       console.error(error)
       // デモ用のダミーデータ
@@ -42,6 +57,7 @@ export default function AdminDashboardPage() {
         todayCheckIns: 18,
         monthlyRevenue: 4520000,
         newMembersThisMonth: 12,
+        totalStores: 2,
       })
     } finally {
       setIsLoading(false)
@@ -91,6 +107,13 @@ export default function AdminDashboardPage() {
       icon: UserPlus,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/20',
+    },
+    {
+      title: '店舗数',
+      value: stats?.totalStores || 0,
+      icon: Building2,
+      color: 'text-teal-500',
+      bgColor: 'bg-teal-500/20',
     },
   ]
 
@@ -204,6 +227,56 @@ export default function AdminDashboardPage() {
             </div>
           </Card>
         </div>
+
+        {/* 店舗情報 */}
+        {stores.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-dark-900">店舗一覧</h2>
+              <button
+                onClick={() => router.push('/admin/stores')}
+                className="text-sm text-primary-500 hover:text-primary-600"
+              >
+                すべて表示 →
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {stores.map((store, index) => (
+                <motion.div
+                  key={store.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card
+                    className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => router.push(`/admin/stores/${store.id}`)}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 rounded-lg bg-teal-500/20">
+                        <Building2 className="w-5 h-5 text-teal-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-dark-900">{store.name}</h3>
+                        <p className="text-xs text-dark-400">コード: {store.code}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4 text-blue-500" />
+                        <span className="text-dark-600">{store._count.members}名</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <UserPlus className="w-4 h-4 text-green-500" />
+                        <span className="text-dark-600">{store._count.trainers}名</span>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   )

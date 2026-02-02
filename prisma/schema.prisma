@@ -11,6 +11,75 @@ datasource db {
 }
 
 // =====================================
+// 店舗関連
+// =====================================
+
+model Store {
+  id              String    @id @default(cuid())
+  name            String    // TRIMGYM つくば
+  code            String    @unique // tsukuba, moriya
+  address         String
+  postalCode      String?
+  phone           String?
+  email           String?
+  imageUrl        String?
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // リレーション
+  staff           StoreStaff[]
+  members         Member[]
+  trainers        Trainer[]
+  checkIns        CheckIn[]
+  orders          Order[]
+  events          Event[]
+  salesRecords    SalesRecord[]
+  schedules       Schedule[]
+  products        Product[]
+
+  @@map("stores")
+}
+
+// 店舗スタッフ（店舗管理者含む）
+model StoreStaff {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  role            String    // manager（店舗管理者）, staff（スタッフ）
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([userId, storeId])
+  @@map("store_staff")
+}
+
+// 売上実績
+model SalesRecord {
+  id              String    @id @default(cuid())
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  date            DateTime
+  type            String    // membership（会費）, product（物販）, lesson（パーソナル）, event（イベント）, other（その他）
+  amount          Int
+  description     String?
+  referenceId     String?   // 関連する注文ID/会員IDなど
+  staffId         String?   // 記録したスタッフ
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("sales_records")
+}
+
+// =====================================
 // ユーザー・認証関連
 // =====================================
 
@@ -18,12 +87,13 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   password      String
-  role          String    @default("member") // member, trainer, owner
+  role          String    @default("member") // member, trainer, staff, store_manager, owner
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   member        Member?
   trainer       Trainer?
+  storeStaff    StoreStaff[]
 
   @@map("users")
 }
@@ -36,6 +106,10 @@ model Member {
   id              String    @id @default(cuid())
   userId          String    @unique
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 店舗所属
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
   
   // 基本情報
   firstName       String
@@ -76,6 +150,10 @@ model Trainer {
   id              String    @id @default(cuid())
   userId          String    @unique
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 店舗所属
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
   
   firstName       String
   lastName        String
@@ -125,6 +203,10 @@ model Schedule {
   trainerId       String
   trainer         Trainer   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
   
+  // 店舗
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
+  
   dayOfWeek       Int       // 0-6 (日-土)
   startTime       String    // "09:00"形式
   endTime         String    // "10:00"形式
@@ -173,6 +255,10 @@ model CheckIn {
   memberId        String
   member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
   
+  // 店舗
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
+  
   checkedInAt     DateTime  @default(now())
   checkedOutAt    DateTime?
   method          String    @default("qr") // qr, manual
@@ -194,6 +280,10 @@ model Product {
   stock           Int       @default(0)
   isActive        Boolean   @default(true)
   
+  // 店舗
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -206,6 +296,10 @@ model Order {
   id              String    @id @default(cuid())
   memberId        String
   member          Member    @relation(fields: [memberId], references: [id])
+  
+  // 店舗
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
   
   totalAmount     Int
   status          String    @default("pending") // pending, paid, shipped, delivered, cancelled
@@ -250,6 +344,10 @@ model Event {
   price           Int       @default(0) // 0 = 無料
   eventType       String    // seminar, competition, workshop, social
   isPublished     Boolean   @default(false)
+  
+  // 店舗
+  storeId         String?
+  store           Store?    @relation(fields: [storeId], references: [id])
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Calendar, QrCode, ShoppingBag, 
   CalendarDays, Settings, LogOut, Menu, X,
-  Flame, Bell, UserCog, Package, CreditCard
+  Flame, Bell, UserCog, Package, CreditCard, Store, Building2
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -17,6 +17,7 @@ interface AdminLayoutProps {
 
 const adminNavItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'ダッシュボード' },
+  { href: '/admin/stores', icon: Building2, label: '店舗管理' },
   { href: '/admin/members', icon: Users, label: '会員管理' },
   { href: '/admin/reservations', icon: Calendar, label: '予約管理' },
   { href: '/admin/checkin', icon: QrCode, label: 'チェックイン' },
@@ -102,15 +103,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="lg:ml-64">
         {/* Top Bar */}
         <header className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
             <button
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
               {isSidebarOpen ? (
-                <X className="w-6 h-6 text-gray-700" />
+                <X className="w-5 h-5 text-gray-700" />
               ) : (
-                <Menu className="w-6 h-6 text-gray-700" />
+                <Menu className="w-5 h-5 text-gray-700" />
               )}
             </button>
 
@@ -128,7 +129,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-6 lg:p-8">
+        <main className="p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>
