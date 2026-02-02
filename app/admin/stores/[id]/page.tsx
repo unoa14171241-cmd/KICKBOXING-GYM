@@ -122,18 +122,25 @@ export default function StoreDetailPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => router.push('/admin/stores')}
+                className="text-xs"
               >
                 ← 戻る
               </Button>
             </div>
             <div className="flex items-center gap-3 mt-2">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">{store.name}</h1>
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900">{store.name}</h1>
               <Badge variant={store.isActive ? 'success' : 'danger'}>
                 {store.isActive ? '営業中' : '休止中'}
               </Badge>
             </div>
-            <p className="text-sm text-gray-600 mt-1">店舗コード: {store.code}</p>
+            <p className="text-xs text-gray-600 mt-1">店舗コード: {store.code}</p>
           </div>
+          <Button
+            onClick={() => router.push(`/admin/stores/${store.id}/dashboard`)}
+            className="w-full sm:w-auto text-sm"
+          >
+            📊 店舗ダッシュボードを開く
+          </Button>
         </div>
 
         {/* 統計カード */}
@@ -235,40 +242,56 @@ export default function StoreDetailPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="p-4 md:p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">クイックアクション</h2>
-              <div className="grid grid-cols-2 gap-3">
+            <Card className="p-3 md:p-6">
+              <h2 className="text-sm md:text-lg font-bold text-gray-900 mb-3">クイックアクション</h2>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => router.push(`/admin/stores/${store.id}/dashboard`)}
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
+                >
+                  <span className="text-lg md:text-2xl mb-1">📊</span>
+                  <span>ダッシュボード</span>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => router.push(`/admin/stores/${store.id}/checkin`)}
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
+                >
+                  <span className="text-lg md:text-2xl mb-1">✅</span>
+                  <span>チェックイン</span>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => router.push(`/admin/stores/${store.id}/reservations`)}
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
+                >
+                  <span className="text-lg md:text-2xl mb-1">📅</span>
+                  <span>予約管理</span>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => router.push(`/admin/stores/${store.id}/members`)}
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
+                >
+                  <span className="text-lg md:text-2xl mb-1">👤</span>
+                  <span>会員管理</span>
+                </Button>
                 <Button
                   variant="secondary"
                   onClick={() => router.push(`/admin/stores/${store.id}/staff`)}
-                  className="h-20 flex flex-col items-center justify-center"
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
                 >
-                  <span className="text-2xl mb-1">👥</span>
-                  <span className="text-sm">スタッフ管理</span>
+                  <span className="text-lg md:text-2xl mb-1">👥</span>
+                  <span>スタッフ</span>
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={() => router.push(`/admin/stores/${store.id}/sales`)}
-                  className="h-20 flex flex-col items-center justify-center"
+                  className="h-16 md:h-20 flex flex-col items-center justify-center text-xs"
                 >
-                  <span className="text-2xl mb-1">💰</span>
-                  <span className="text-sm">売上実績</span>
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => router.push(`/admin/members?store=${store.id}`)}
-                  className="h-20 flex flex-col items-center justify-center"
-                >
-                  <span className="text-2xl mb-1">🏃</span>
-                  <span className="text-sm">会員一覧</span>
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => router.push(`/admin/checkin?store=${store.id}`)}
-                  className="h-20 flex flex-col items-center justify-center"
-                >
-                  <span className="text-2xl mb-1">✅</span>
-                  <span className="text-sm">チェックイン</span>
+                  <span className="text-lg md:text-2xl mb-1">💰</span>
+                  <span>売上実績</span>
                 </Button>
               </div>
             </Card>
