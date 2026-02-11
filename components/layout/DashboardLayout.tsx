@@ -109,9 +109,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="lg:ml-64">
         {/* Top Bar */}
         <header className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
             <button
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
               {isSidebarOpen ? (
@@ -134,7 +134,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-6 lg:p-8">
+        <main className="p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>

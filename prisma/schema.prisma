@@ -262,6 +262,7 @@ model CheckIn {
   checkedInAt     DateTime  @default(now())
   checkedOutAt    DateTime?
   method          String    @default("qr") // qr, manual
+  notes           String?   // 来店時のメモ（VisitLog機能統合）
   
   @@map("check_ins")
 }

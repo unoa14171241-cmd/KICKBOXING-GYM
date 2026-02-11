@@ -18,7 +18,7 @@
 - **フレームワーク**: Next.js 14 (App Router)
 - **言語**: TypeScript
 - **スタイリング**: Tailwind CSS
-- **データベース**: SQLite (Prisma ORM)
+- **データベース**: PostgreSQL (Prisma ORM)
 - **認証**: NextAuth.js
 - **アニメーション**: Framer Motion
 - **QRコード**: qrcode.react
@@ -36,7 +36,7 @@ npm install
 `.env` ファイルを作成：
 
 ```env
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgres://user:password@localhost:5432/dbname"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-super-secret-key-change-in-production"
 GYM_NAME="BLAZE KICKBOXING GYM"
