@@ -129,7 +129,7 @@ export default function MemberDetailPage() {
       const res = await fetch('/api/trainers')
       if (res.ok) {
         const data = await res.json()
-        setTrainers(data)
+        setTrainers(Array.isArray(data.trainers) ? data.trainers : [])
       }
     } catch (error) {
       console.error(error)
