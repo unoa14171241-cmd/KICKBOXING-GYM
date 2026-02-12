@@ -23,6 +23,7 @@ export async function GET(
           },
         },
         plan: true,
+        store: true,
       },
     })
 
@@ -48,6 +49,7 @@ export async function GET(
       emergencyContact: member.emergencyContact,
       emergencyPhone: member.emergencyPhone,
       plan: member.plan,
+      store: member.store,
     })
   } catch (error) {
     console.error('Member fetch error:', error)
@@ -85,6 +87,7 @@ export async function PUT(
       planId,
       status,
       remainingSessions,
+      storeId,
     } = body
 
     // 会員の存在確認
@@ -132,6 +135,7 @@ export async function PUT(
           emergencyContact: emergencyContact || null,
           emergencyPhone: emergencyPhone || null,
           planId: planId || null,
+          storeId: storeId || null,
           status,
           remainingSessions: remainingSessions || 0,
         },

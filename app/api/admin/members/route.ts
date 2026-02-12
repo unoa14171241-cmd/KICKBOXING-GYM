@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
           select: { email: true },
         },
         plan: true,
+        store: true,
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -37,7 +38,12 @@ export async function GET(request: NextRequest) {
       remainingSessions: member.remainingSessions,
       joinedAt: member.joinedAt,
       plan: member.plan,
+      store: member.store ? {
+        id: member.store.id,
+        name: member.store.name,
+      } : null,
     }))
+
 
     return NextResponse.json({ members: formattedMembers })
   } catch (error) {

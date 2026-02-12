@@ -13,6 +13,11 @@ interface Plan {
   price: number
 }
 
+interface Store {
+  id: string
+  name: string
+}
+
 interface MemberForm {
   firstName: string
   lastName: string
@@ -26,6 +31,7 @@ interface MemberForm {
   emergencyContact: string
   emergencyPhone: string
   planId: string
+  storeId: string
   status: string
   remainingSessions: number
 }
@@ -36,9 +42,10 @@ export default function EditMemberPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [plans, setPlans] = useState<Plan[]>([])
+  const [stores, setStores] = useState<Store[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  
+
   const [formData, setFormData] = useState<MemberForm>({
     firstName: '',
     lastName: '',
@@ -52,13 +59,14 @@ export default function EditMemberPage() {
     emergencyContact: '',
     emergencyPhone: '',
     planId: '',
+    storeId: '',
     status: 'active',
     remainingSessions: 0,
   })
 
   useEffect(() => {
     if (params.id) {
-      Promise.all([fetchMember(), fetchPlans()])
+      Promise.all([fetchMember(), fetchPlans(), fetchStores()])
     }
   }, [params.id])
 
@@ -80,6 +88,7 @@ export default function EditMemberPage() {
           emergencyContact: data.emergencyContact || '',
           emergencyPhone: data.emergencyPhone || '',
           planId: data.plan?.id || '',
+          storeId: data.store?.id || '',
           status: data.status || 'active',
           remainingSessions: data.remainingSessions || 0,
         })
@@ -98,6 +107,18 @@ export default function EditMemberPage() {
       if (res.ok) {
         const data = await res.json()
         setPlans(data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchStores = async () => {
+    try {
+      const res = await fetch('/api/stores')
+      if (res.ok) {
+        const data = await res.json()
+        setStores(data)
       }
     } catch (error) {
       console.error(error)
@@ -173,7 +194,7 @@ export default function EditMemberPage() {
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-600 mb-6">
               {success}
@@ -307,6 +328,22 @@ export default function EditMemberPage() {
           <Card className="mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">プラン・ステータス</h2>
             <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">所属店舗</label>
+                <select
+                  name="storeId"
+                  value={formData.storeId}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">店舗を選択してください</option>
+                  {stores.map(store => (
+                    <option key={store.id} value={store.id}>
+                      {store.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">プラン</label>
                 <select

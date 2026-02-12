@@ -34,6 +34,10 @@ interface Member {
     name: string
     price: number
   } | null
+  store: {
+    id: string
+    name: string
+  } | null
 }
 
 export default function MembersPage() {
@@ -147,6 +151,7 @@ export default function MembersPage() {
                   <tr>
                     <th>会員</th>
                     <th>会員番号</th>
+                    <th>所属店舗</th>
                     <th>プラン</th>
                     <th>残りセッション</th>
                     <th>ステータス</th>
@@ -168,6 +173,13 @@ export default function MembersPage() {
                         </td>
                         <td>
                           <span className="font-mono text-dark-300">{member.memberNumber}</span>
+                        </td>
+                        <td>
+                          {member.store ? (
+                            <span className="text-dark-900">{member.store.name}</span>
+                          ) : (
+                            <span className="text-dark-400">未設定</span>
+                          )}
                         </td>
                         <td>
                           {member.plan ? (
