@@ -20,6 +20,12 @@ interface Plan {
   features: string[]
 }
 
+interface Store {
+  id: string
+  name: string
+  code: string
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -28,8 +34,11 @@ export default function RegisterPage() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [plansLoading, setPlansLoading] = useState(true)
   const [plansError, setPlansError] = useState('')
-  
+
+  const [stores, setStores] = useState<Store[]>([])
+
   const [formData, setFormData] = useState({
+    storeId: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -61,6 +70,13 @@ export default function RegisterPage() {
         setPlansError('プランを読み込めませんでした。プランなしで登録を続けることができます。')
         setPlansLoading(false)
       })
+
+
+    // 店舗一覧を取得
+    fetch('/api/stores')
+      .then(res => res.json())
+      .then(data => setStores(data))
+      .catch(err => console.error('店舗取得エラー:', err))
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -77,6 +93,12 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       setError('パスワードが一致しません')
+      setIsLoading(false)
+      return
+    }
+
+    if (!formData.storeId) {
+      setError('利用店舗を選択してください')
       setIsLoading(false)
       return
     }
@@ -105,7 +127,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
       <Navbar />
-      
+
       <div className="flex items-center justify-center min-h-screen px-4 py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -117,11 +139,10 @@ export default function RegisterPage() {
             <div className="flex items-center justify-center mb-8">
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                    step >= s 
-                      ? 'bg-primary-500 text-white' 
-                      : 'bg-gray-200 text-gray-400'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${step >= s
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-gray-200 text-gray-400'
+                    }`}>
                     {step > s ? <CheckCircle className="w-5 h-5" /> : s}
                   </div>
                   {s < 3 && (
@@ -149,6 +170,26 @@ export default function RegisterPage() {
                       {error}
                     </div>
                   )}
+
+
+
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">利用店舗 *</label>
+                    <select
+                      name="storeId"
+                      value={formData.storeId}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      required
+                    >
+                      <option value="">店舗を選択してください</option>
+                      {stores.map(store => (
+                        <option key={store.id} value={store.id}>
+                          {store.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <Input
@@ -283,7 +324,7 @@ export default function RegisterPage() {
                       {error}
                     </div>
                   )}
-                  
+
                   <div className="space-y-3">
                     {plansLoading ? (
                       <div className="text-center py-8 text-gray-500">
@@ -294,11 +335,10 @@ export default function RegisterPage() {
                       plans.map((plan) => (
                         <label
                           key={plan.id}
-                          className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                            formData.planId === plan.id
-                              ? 'border-primary-500 bg-primary-50'
-                              : 'border-gray-200 hover:border-gray-300 bg-white'
-                          }`}
+                          className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.planId === plan.id
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
                         >
                           <input
                             type="radio"

@@ -17,12 +17,21 @@ export async function POST(request: NextRequest) {
       dateOfBirth,
       gender,
       planId,
+      storeId,
     } = body
 
     // バリデーション
     if (!email || !password || !firstName || !lastName || !phone) {
       return NextResponse.json(
         { error: '必須項目を入力してください' },
+        { status: 400 }
+      )
+    }
+
+    // 店舗のバリデーション
+    if (!storeId) {
+      return NextResponse.json(
+        { error: '店舗を選択してください' },
         { status: 400 }
       )
     }
@@ -45,7 +54,7 @@ export async function POST(request: NextRequest) {
     // ユーザーと会員情報を作成
     // planIdが空文字列の場合はnullに変換
     const validPlanId = planId && planId.trim() !== '' ? planId : null
-    
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -63,6 +72,7 @@ export async function POST(request: NextRequest) {
             memberNumber: generateMemberNumber(),
             qrCode: generateQRCode(),
             planId: validPlanId,
+            storeId: storeId,
             status: 'active',
             remainingSessions: 0,
           },

@@ -6,6 +6,37 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
+  // 店舗を作成
+  const stores = await Promise.all([
+    prisma.store.upsert({
+      where: { code: 'tsukuba' },
+      update: {},
+      create: {
+        name: 'TRIM GYM つくば本店',
+        code: 'tsukuba',
+        address: '茨城県つくば市研究学園5-5-5',
+        postalCode: '305-0817',
+        phone: '029-888-8888',
+        email: 'tsukuba@trim-gym.jp',
+        isActive: true,
+      },
+    }),
+    prisma.store.upsert({
+      where: { code: 'moriya' },
+      update: {},
+      create: {
+        name: 'TRIM GYM 守谷店',
+        code: 'moriya',
+        address: '茨城県守谷市中央1-1-1',
+        postalCode: '302-0115',
+        phone: '0297-77-7777',
+        email: 'moriya@trim-gym.jp',
+        isActive: true,
+      },
+    }),
+  ])
+  console.log('✅ Stores created')
+
   // プランを作成（TRIM GYM料金体系）
   const plans = await Promise.all([
     prisma.plan.upsert({

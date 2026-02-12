@@ -5,11 +5,20 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Card, Badge, Button, Input, Modal } from '@/components/ui'
 import { AdminLayout } from '@/components/layout/AdminLayout'
-import { 
+import {
   Users, Search, Plus, Filter, MoreVertical,
-  Mail, Phone, Calendar, Edit, Trash2, Eye
+  Mail, Phone, Calendar, Edit, Trash2, Eye,
+  CheckCircle2, History
 } from 'lucide-react'
-import { formatDate, formatCurrency } from '@/lib/utils'
+import { formatDate, formatCurrency, formatDateTime } from '@/lib/utils'
+
+interface VisitLog {
+  id: string
+  memberId: string
+  checkedInAt: string
+  method: string
+  notes?: string
+}
 
 interface Member {
   id: string
@@ -32,6 +41,10 @@ export default function MembersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  // 来店履歴モーダル用
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null)
+  const [visitLogs, setVisitLogs] = useState<VisitLog[]>([])
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
   useEffect(() => {
     fetchMembers()
@@ -49,13 +62,27 @@ export default function MembersPage() {
     }
   }
 
+  const fetchVisitHistory = async (member: Member) => {
+    try {
+      setSelectedMember(member)
+      setIsHistoryOpen(true)
+      const res = await fetch(`/api/members/${member.id}/visits`)
+      if (res.ok) {
+        const data = await res.json()
+        setVisitLogs(data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const filteredMembers = members.filter(member => {
-    const matchesSearch = 
+    const matchesSearch =
       member.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.memberNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     const matchesStatus = statusFilter === 'all' || member.status === statusFilter
 
     return matchesSearch && matchesStatus
@@ -165,6 +192,13 @@ export default function MembersPage() {
                         </td>
                         <td>
                           <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => fetchVisitHistory(member)}
+                              className="p-2 rounded-lg hover:bg-dark-700 transition-colors"
+                              title="来店履歴"
+                            >
+                              <History className="w-4 h-4 text-dark-400" />
+                            </button>
                             <Link
                               href={`/admin/members/${member.id}`}
                               className="p-2 rounded-lg hover:bg-dark-700 transition-colors"
@@ -194,6 +228,47 @@ export default function MembersPage() {
             </div>
           )}
         </Card>
+
+        {/* Visit History Modal */}
+        <Modal
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          title={`来店履歴: ${selectedMember?.lastName} ${selectedMember?.firstName}`}
+          size="lg"
+        >
+          <div className="max-h-[60vh] overflow-y-auto mt-4 pr-2">
+            {visitLogs.length > 0 ? (
+              <div className="space-y-4">
+                {visitLogs.map((log) => (
+                  <div key={log.id} className="flex items-start gap-4 p-4 rounded-lg bg-dark-700/50 border border-dark-700">
+                    <div className="mt-1">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="font-semibold text-dark-200">
+                          {formatDateTime(log.checkedInAt)}
+                        </p>
+                        <Badge status={log.method === 'qr' ? 'active' : 'secondary'}>
+                          {log.method === 'qr' ? 'QRCheckin' : 'Manual'}
+                        </Badge>
+                      </div>
+                      {log.notes && (
+                        <p className="text-sm text-dark-400 mt-2 bg-dark-800/50 p-2 rounded">
+                          {log.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-dark-400">
+                <p>来店履歴はありません</p>
+              </div>
+            )}
+          </div>
+        </Modal>
       </div>
     </AdminLayout>
   )
