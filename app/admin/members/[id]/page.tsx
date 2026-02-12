@@ -34,6 +34,10 @@ interface Member {
     name: string
     price: number
   } | null
+  store: {
+    id: string
+    name: string
+  } | null
 }
 
 interface TrainingReport {
@@ -156,11 +160,11 @@ export default function MemberDetailPage() {
   const handleEditReport = (report: TrainingReport) => {
     setEditingReport(report)
     setReportForm({
-      trainerId: report.trainer.id,
-      trainingDate: report.trainingDate.split('T')[0],
+      trainerId: report.trainer?.id || '',
+      trainingDate: report.trainingDate ? report.trainingDate.split('T')[0] : '',
       duration: report.duration?.toString() || '',
-      menuItems: report.menuItems,
-      trainerComment: report.trainerComment,
+      menuItems: report.menuItems || '',
+      trainerComment: report.trainerComment || '',
       nextGoal: report.nextGoal || '',
       physicalNote: report.physicalNote || '',
     })
@@ -263,8 +267,8 @@ export default function MemberDetailPage() {
             <button
               onClick={() => setActiveTab('info')}
               className={`${activeTab === 'info'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
               基本情報
@@ -272,8 +276,8 @@ export default function MemberDetailPage() {
             <button
               onClick={() => setActiveTab('reports')}
               className={`${activeTab === 'reports'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
             >
               <FileText className="w-4 h-4" />
@@ -435,7 +439,7 @@ export default function MemberDetailPage() {
                           )}
                         </div>
                         <p className="text-sm text-gray-500">
-                          担当: {report.trainer.lastName} {report.trainer.firstName}
+                          担当: {report.trainer ? `${report.trainer.lastName} ${report.trainer.firstName}` : '不明'}
                         </p>
                       </div>
                       <div className="flex gap-2">
