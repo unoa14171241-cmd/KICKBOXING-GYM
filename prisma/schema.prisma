@@ -142,6 +142,7 @@ model Member {
   checkIns        CheckIn[]
   orders          Order[]
   eventRegistrations EventRegistration[]
+  trainingReports TrainingReport[]
 
   @@map("members")
 }
@@ -167,6 +168,7 @@ model Trainer {
 
   schedules       Schedule[]
   reservations    Reservation[]
+  trainingReports TrainingReport[]
 
   @@map("trainers")
 }
@@ -358,6 +360,7 @@ model Event {
   @@map("events")
 }
 
+
 model EventRegistration {
   id              String    @id @default(cuid())
   eventId         String
@@ -372,4 +375,33 @@ model EventRegistration {
 
   @@unique([eventId, memberId])
   @@map("event_registrations")
+}
+
+// =====================================
+// トレーニングレポート（パーソナル指導記録）
+// =====================================
+
+model TrainingReport {
+  id              String    @id @default(cuid())
+  
+  // 関連
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  trainerId       String
+  trainer         Trainer   @relation(fields: [trainerId], references: [id])
+  
+  // トレーニング情報
+  trainingDate    DateTime  // トレーニング実施日時
+  duration        Int?      // 所要時間（分）
+  
+  // 内容
+  menuItems       String    // 実施メニュー（複数行テキスト）
+  trainerComment  String    // トレーナーからのコメント
+  nextGoal        String?   // 次回の目標
+  physicalNote    String?   // 体調・進捗メモ
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("training_reports")
 }
